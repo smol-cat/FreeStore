@@ -6,7 +6,7 @@ using server.Entities;
 namespace server.Controllers;
 public class MainController : ControllerBase
 {
-    public DbConnection Db = DbConnection.Instance;
+    protected static DbConnection Db = DbConnection.Instance;
 
     public override OkObjectResult Ok(object? value)
     {
