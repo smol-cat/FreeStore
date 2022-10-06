@@ -6,24 +6,20 @@ using server.Entities;
 namespace server.Controllers;
 public class MainController : ControllerBase
 {
+    public DbConnection Db = DbConnection.Instance;
+
+    public override OkObjectResult Ok(object? value)
+    {
+        return base.Ok(value);
+    }
+
     [NonAction]
     public NotAcceptableObjectResult NotAcceptable(object message = null) => new NotAcceptableObjectResult(message);
 
     [NonAction]
-    public ServerErrorObjectResult ServerError(ServerErrorType errorType = ServerErrorType.Regular, string optionalMessage = null)
-    {
-        switch (errorType)
-        {
-            case ServerErrorType.Database:
-                return new ServerErrorObjectResult(new ServerErrorModel(DbConnection.Instance.LastException.Message, optionalMessage, DbConnection.Instance.LastException.StackTrace));
-            default:
-                return new ServerErrorObjectResult(new ServerErrorModel(optionalMessage));
-        }
-    }
-}
+    public ServerErrorObjectResult ServerError(string optionalMessage = null) =>
+        new ServerErrorObjectResult(new ServerErrorModel(optionalMessage));
 
-public enum ServerErrorType
-{
-    Regular,
-    Database
+    public ServerErrorObjectResult DatabaseError(string optionalMessage = null) =>
+        new ServerErrorObjectResult(new ServerErrorModel(DbConnection.Instance.LastException.Message, optionalMessage, DbConnection.Instance.LastException.StackTrace));
 }

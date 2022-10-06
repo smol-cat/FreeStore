@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace server.Entities;
 
-class DbConnection
+public class DbConnection
 {
     public static string Server = "localhost";
     public static int Port = 3306;
@@ -41,7 +41,6 @@ class DbConnection
         using var cmd = new MySqlCommand();
         cmd.Connection = conn;
         cmd.CommandText = query;
-        cmd.ExecuteNonQuery();
         LastInsertedId = cmd.LastInsertedId;
         return cmd.ExecuteReader();
     }

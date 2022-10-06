@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace server.Models.Authentication;
 
-public class ReqRegistrationModel
+public class RegistrationModel
 {
     [JsonInclude]
     public string Name { get; set; }
