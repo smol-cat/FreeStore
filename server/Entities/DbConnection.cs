@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using Microsoft.Data.SqlClient;
 using System.Runtime.Serialization;
 using System.Reflection;
+using server.Models;
 
 namespace server.Entities;
 
@@ -93,7 +94,7 @@ public class DbConnection
         }
     }
 
-    public bool SelectAndDeserialize<T>(string query, out List<T> result) where T : new()
+    public bool SelectAndDeserialize<T>(string query, out List<T> result) where T : IDeserializable, new()
     {
         MySqlDataReader reader = null;
         result = new();
@@ -103,23 +104,7 @@ public class DbConnection
             while (reader.Read())
             {
                 T entry = new();
-                PropertyInfo[] properties = typeof(T).GetProperties() ?? throw new Exception($"Could not get properties of the type '{typeof(T).Name}'");
-                Dictionary<string, PropertyInfo> mappedProperties = properties.ToList().ToDictionary(e => e.Name.ToLower(), e => e);
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    string dbProperty = reader.GetName(i).ToLower();
-                    if (mappedProperties.TryGetValue(dbProperty, out PropertyInfo property))
-                    {
-                        try
-                        {
-                            property.SetValue(entry, reader.GetValue(i));
-                        }
-                        catch (ArgumentException e)
-                        {
-                            throw new ArgumentException($"Tried to convert field {reader.GetName(i)} to incompatible type: {e.Message}");
-                        }
-                    }
-                }
+                entry.Deserialize(reader);
                 result.Add(entry);
             }
             reader.Close();

@@ -97,5 +97,4 @@ public class CategoryController : MainController
 
         return Ok(new ResponseModel("Category has been removed"));
     }
-    
 }
