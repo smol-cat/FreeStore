@@ -18,9 +18,10 @@ public class AccountController : MainController
             return NotAcceptable(new ResponseModel("Email is invalid"));
         }
 
-        if (Regexes.InvalidName.IsMatch(regForm.Name) || Regexes.InvalidName.IsMatch(regForm.LastName))
+        if (Regexes.InvalidName.IsMatch(regForm.Name) || Regexes.InvalidName.IsMatch(regForm.LastName) ||
+            string.IsNullOrEmpty(regForm.Name) || string.IsNullOrEmpty(regForm.LastName))
         {
-            return NotAcceptable(new ResponseModel("Name or last name contain invalid characters"));
+            return NotAcceptable(new ResponseModel("Name or last name is empty or contain invalid characters"));
         }
 
         if (regForm.Password.Length < 8)
@@ -28,7 +29,7 @@ public class AccountController : MainController
             return NotAcceptable(new ResponseModel("Password should contain at least 8 characters"));
         }
 
-        if (!Db.SelectAndDeserialize($"SELECT email FROM account WHERE email = \"{regForm.Email}\"", out var emails))
+        if (!Db.SelectAndDeserialize($"SELECT email FROM account WHERE email = @email", new() { ["email"] = regForm.Email }, out var emails))
         {
             return DatabaseError();
         }
@@ -40,10 +41,18 @@ public class AccountController : MainController
 
         string hash = Utils.SHA256String(regForm.Password);
 
-        if (!Db.Execute("INSERT INTO account (name, last_name, email, password, date_created)" +
-        $"VALUES (\"{regForm.Name}\", \"{regForm.LastName}\", \"{regForm.Email}\", \"{hash}\", \"{DateTime.Now.ToString(Globals.MySqlDateFormat)}\")"))
+        Dictionary<string, object> parameters = new()
         {
-            return DatabaseError();
+            ["name"] = regForm.Name,
+            ["last_name"] = regForm.LastName,
+            ["email"] = regForm.Email,
+            ["password"] = hash,
+            ["date_created"] = DateTime.Now.ToString(Globals.MySqlDateFormat)
+        };
+
+        if (!Db.Execute("INSERT INTO account (name, last_name, email, password, date_created) VALUES (@name, @last_name, @email, @password, @date_created)", parameters))
+        {
+            return DatabaseError("Failed to create an account");
         }
 
         return Created($"/api/v1/account/{Db.LastInsertedId}", new ResponseModel());
@@ -55,7 +64,7 @@ public class AccountController : MainController
     [Route("login")]
     public async Task<IActionResult> Login(LoginModel loginModel)
     {
-        if (!Db.SelectAndDeserialize<AccountModel>($"SELECT * FROM account WHERE email = \"{loginModel.Email}\" AND is_blocked = 0", out var accounts))
+        if (!Db.SelectAndDeserialize($"SELECT * FROM account WHERE email = @email AND is_blocked = 0", new() { ["email"] = loginModel.Email }, out var accounts))
         {
             return DatabaseError("Error while searching for account");
         }
@@ -67,7 +76,7 @@ public class AccountController : MainController
 
         var account = accounts.First();
 
-        string passwordHash = account.Password;
+        string passwordHash = (string)account["password"];
         string reqPasswordHash = Utils.SHA256String(loginModel.Password);
 
         if (!passwordHash.Equals(reqPasswordHash))
@@ -83,9 +92,8 @@ public class AccountController : MainController
         // ClaimsIdentity claimsIdentity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         // ClaimsPrincipal claimsPrincipal = new(claimsIdentity);
         // await HttpContext.SignInAsync(claimsPrincipal);
-        account.Password = null;
 
-        return Ok(account);
+        return Ok(new ResponseModel("You've logged in"));
     }
 
     // [HttpGet]
@@ -100,7 +108,7 @@ public class AccountController : MainController
     [Route("{id}")]
     public IActionResult GetAccount(int id)
     {
-        if (!Db.SelectAndDeserialize<AccountModel>($"SELECT * FROM account WHERE id = {id} AND is_blocked = 0", out var account))
+        if (!Db.SelectAndDeserialize<PersonalAccountModel>($"SELECT * FROM account WHERE id = @id AND is_blocked = 0", new() { ["id"] = id }, out var account))
         {
             return DatabaseError();
         }
@@ -117,9 +125,9 @@ public class AccountController : MainController
     [Route("{id}")]
     public IActionResult DeleteAccount(int id)
     {
-        if (!Db.SelectAndDeserialize($"SELECT id FROM account WHERE id = {id} AND is_blocked = 0", out var account))
+        if (!Db.SelectAndDeserialize<PersonalAccountModel>($"SELECT * FROM account WHERE id = @id AND is_blocked = 0", new() { ["id"] = id }, out var account))
         {
-            return DatabaseError("Error occured while searching for account");
+            return DatabaseError();
         }
 
         if (!account.Any())
@@ -127,7 +135,7 @@ public class AccountController : MainController
             return NotFound(new ResponseModel("Account was not found"));
         }
 
-        if (!Db.Execute($"UPDATE account SET is_blocked = true WHERE id = {id} AND is_blocked = 0"))
+        if (!Db.Execute($"UPDATE account SET is_blocked = true WHERE id = {id} AND is_blocked = 0", new() { ["id"] = id }))
         {
             return DatabaseError("Error occured while deleting account");
         }
@@ -144,13 +152,13 @@ public class AccountController : MainController
             return loginResult;
         }
 
-        return DeleteAccount(((AccountModel)((OkObjectResult)loginResult).Value).Id);
+        return DeleteAccount(((PersonalAccountModel)((OkObjectResult)loginResult).Value).Id);
     }
 
     [HttpGet]
     public IActionResult GetAccountList()
     {
-        if (!Db.SelectAndDeserialize<AccountModel>("SELECT id, name, last_name, is_blocked, level FROM account WHERE is_blocked = 0", out List<AccountModel> accounts))
+        if (!Db.SelectAndDeserialize<AccountModel>("SELECT id, name, last_name, date_created FROM account WHERE is_blocked = 0", new(), out List<AccountModel> accounts))
         {
             return DatabaseError("Error getting list of accounts");
         }
@@ -162,7 +170,7 @@ public class AccountController : MainController
     [Route("{id}")]
     public IActionResult UpdateAccount(int id, ProfileModel profileModel)
     {
-        if (!Db.SelectAndDeserialize($"SELECT id FROM account WHERE id = {id} AND is_blocked = 0", out var account))
+        if (!Db.SelectAndDeserialize($"SELECT id FROM account WHERE id = {id} AND is_blocked = 0", new() { ["id"] = id }, out var account))
         {
             return DatabaseError("Error occured while searching for account");
         }
@@ -172,7 +180,15 @@ public class AccountController : MainController
             return NotFound(new ResponseModel("Account was not found"));
         }
 
-        if (!Db.Execute($"UPDATE account SET name = \"{profileModel.Name}\", last_name = \"{profileModel.LastName}\", phone_number = \"{profileModel.PhoneNumber}\" WHERE id = {id}"))
+        Dictionary<string, object> parameters = new()
+        {
+            ["name"] = profileModel.Name,
+            ["last_name"] = profileModel.LastName,
+            ["phone_number"] = profileModel.PhoneNumber,
+            ["id"] = id
+        };
+
+        if (!Db.Execute($"UPDATE account SET name = @name, last_name = @last_name, phone_number = @phone_number WHERE id = @id", parameters))
         {
             return DatabaseError("Error updating account");
         }

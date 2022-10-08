@@ -1,7 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using server.Controllers.ObjectResults;
-using server.Entities;
+using server.Database;
 
 namespace server.Controllers;
 public class MainController : ControllerBase

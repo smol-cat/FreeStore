@@ -1,5 +1,6 @@
 
-using MySql.Data.MySqlClient;
+using System.Text.Json.Serialization;
+using server.Database;
 using server.Models.Account;
 using server.Models.Category;
 using server.Models.Other;
@@ -10,17 +11,19 @@ public class DetailedItemModel : IDeserializable
     public int Id { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
+    public decimal Price { get; set; }
     public List<int> Image_ids { get; set; }
-    public CategoryModel Category { get; set; }
+    public IdCategoryModel Category { get; set; }
     public AccountModel Account { get; set; }
     public StateModel State { get; set; }
 
-    public void Deserialize(MySqlDataReader reader)
+    public void Deserialize(MySqlCustomReader reader)
     {
         Id = (int)reader["id"];
         Title = (string)reader["title"];
+        Price = (decimal)reader["price"];
         Description = (string)reader["description"];
-        Image_ids = ((string)reader["image_ids"]).Split(";").Select(e => int.Parse(e)).ToList();
+        Image_ids = ((string?)reader["image_ids"])?.Split(",").Select(e => int.Parse(e)).ToList() ?? new();
         Category = new IdCategoryModel
         {
             Id = (int)reader["category_id"],

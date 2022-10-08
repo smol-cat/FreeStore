@@ -1,6 +1,5 @@
 
-using System.Text.Json.Serialization;
-using MySql.Data.MySqlClient;
+using server.Database;
 
 namespace server.Models.Category;
 public class CategoryModel
@@ -13,7 +12,7 @@ public class IdCategoryModel : CategoryModel, IDeserializable
 {
     public int Id { get; set; }
 
-    public void Deserialize(MySqlDataReader reader)
+    public void Deserialize(MySqlCustomReader reader)
     {
         Id = (int)reader["id"];
         Name = (string)reader["name"];

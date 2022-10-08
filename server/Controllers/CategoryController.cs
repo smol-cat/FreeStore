@@ -13,7 +13,7 @@ public class CategoryController : MainController
     public static bool TryGetCategory(int id, out IdCategoryModel category)
     {
         category = null;
-        if (!Db.SelectAndDeserialize<IdCategoryModel>($"SELECT * FROM category WHERE id = {id} AND unlisted = 0", out var categories))
+        if (!Db.SelectAndDeserialize<IdCategoryModel>($"SELECT * FROM category WHERE id = @id AND unlisted = 0", new() { ["id"] = id }, out var categories))
         {
             return false;
         }
@@ -25,7 +25,7 @@ public class CategoryController : MainController
     [HttpGet]
     public IActionResult List()
     {
-        if (!Db.SelectAndDeserialize<IdCategoryModel>("SELECT * FROM category WHERE unlisted = 0", out var categories))
+        if (!Db.SelectAndDeserialize<IdCategoryModel>("SELECT * FROM category WHERE unlisted = 0", new(), out var categories))
         {
             return DatabaseError("Error fetching list of categories");
         }
@@ -41,7 +41,13 @@ public class CategoryController : MainController
             return NotAcceptable(new ResponseModel("Fields: description and name are required"));
         }
 
-        if (!Db.Execute($"INSERT INTO category (name, description) VALUES (\"{categoryModel.Name}\", \"{categoryModel.Description}\")"))
+        Dictionary<string, object> parameters = new()
+        {
+            ["name"] = categoryModel.Name,
+            ["description"] = categoryModel.Description,
+        };
+
+        if (!Db.Execute($"INSERT INTO category (name, description) VALUES (@name, @description)", parameters))
         {
             return DatabaseError("Failed to insert into categories");
         }
@@ -68,7 +74,14 @@ public class CategoryController : MainController
             return NotFound(new ResponseModel("Category is not found"));
         }
 
-        if (!Db.Execute($"UPDATE category SET name = \"{categoryModel.Name}\", description = \"{categoryModel.Description}\" WHERE id = {id}"))
+        Dictionary<string, object> parameters = new()
+        {
+            ["name"] = categoryModel.Name,
+            ["description"] = categoryModel.Description,
+            ["id"] = id
+        };
+
+        if (!Db.Execute($"UPDATE category SET name = @name, description = @description WHERE id = @id", parameters))
         {
             return DatabaseError("Error occured updating category");
         }
@@ -90,7 +103,7 @@ public class CategoryController : MainController
             return NotFound(new ResponseModel("Category is not found"));
         }
 
-        if (!Db.Execute($"UPDATE category SET unlisted = 1 WHERE id = {id}"))
+        if (!Db.Execute($"UPDATE category SET unlisted = 1 WHERE id = @id", new() { ["id"] = id }))
         {
             return DatabaseError("Error occured updating category");
         }

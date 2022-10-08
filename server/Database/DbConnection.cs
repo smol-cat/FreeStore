@@ -1,12 +1,9 @@
 
 
 using MySql.Data.MySqlClient;
-using Microsoft.Data.SqlClient;
-using System.Runtime.Serialization;
-using System.Reflection;
 using server.Models;
 
-namespace server.Entities;
+namespace server.Database;
 
 public class DbConnection
 {
@@ -20,6 +17,18 @@ public class DbConnection
     private static DbConnection _instance = new DbConnection();
 
     public Exception LastException { get; private set; }
+
+    private Dictionary<Type, MySqlDbType> TypeMap = new()
+    {
+        [typeof(string)] = MySqlDbType.VarChar,
+        [typeof(int)] = MySqlDbType.Int32,
+        [typeof(bool)] = MySqlDbType.Int16,
+        [typeof(DateTime?)] = MySqlDbType.DateTime,
+        [typeof(DateTime)] = MySqlDbType.DateTime,
+        [typeof(byte[])] = MySqlDbType.LongBlob,
+        [typeof(decimal)] = MySqlDbType.Decimal,
+        [typeof(double)] = MySqlDbType.Double
+    };
 
     private DbConnection()
     {
@@ -37,23 +46,24 @@ public class DbConnection
 
     public long LastInsertedId { get; private set; }
 
-    private MySqlDataReader ExecuteQuery(string query)
+    private MySqlCustomReader ExecuteQuery(MySqlCommand cmd)
     {
-        using var cmd = new MySqlCommand();
         cmd.Connection = conn;
-        cmd.CommandText = query;
+        MySqlCustomReader reader = new MySqlCustomReader(cmd.ExecuteReader());
         LastInsertedId = cmd.LastInsertedId;
-        return cmd.ExecuteReader();
+        return reader;
     }
 
-    public bool Execute(string query)
+    public bool Execute(string query, Dictionary<string, object> parameters)
     {
         try
         {
             using var cmd = new MySqlCommand();
+            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
             cmd.Connection = conn;
             cmd.CommandText = query;
             cmd.ExecuteNonQuery();
+            LastInsertedId = cmd.LastInsertedId;
             return true;
         }
         catch (Exception e)
@@ -65,13 +75,17 @@ public class DbConnection
         }
     }
 
-    public bool SelectAndDeserialize(string query, out List<Dictionary<string, object>> result)
+    public bool SelectAndDeserialize(string query, Dictionary<string, object> parameters, out List<Dictionary<string, object>> result)
     {
         result = new();
-        MySqlDataReader reader = null;
+        MySqlCustomReader customReader = null;
         try
         {
-            reader = ExecuteQuery(query);
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.CommandText = query;
+            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+            customReader = ExecuteQuery(cmd);
+            var reader = customReader.Reader;
             while (reader.Read())
             {
                 var entry = new Dictionary<string, object>();
@@ -86,7 +100,7 @@ public class DbConnection
         }
         catch (Exception e)
         {
-            reader?.Close();
+            customReader?.Reader.Close();
             LastException = e;
             Console.WriteLine(e.Message);
             Console.WriteLine(e.StackTrace);
@@ -94,25 +108,28 @@ public class DbConnection
         }
     }
 
-    public bool SelectAndDeserialize<T>(string query, out List<T> result) where T : IDeserializable, new()
+    public bool SelectAndDeserialize<T>(string query, Dictionary<string, object> parameters, out List<T> result) where T : IDeserializable, new()
     {
-        MySqlDataReader reader = null;
+        MySqlCustomReader customReader = null;
         result = new();
         try
         {
-            reader = ExecuteQuery(query);
-            while (reader.Read())
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.CommandText = query;
+            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+            customReader = ExecuteQuery(cmd);
+            while (customReader.Reader.Read())
             {
                 T entry = new();
-                entry.Deserialize(reader);
+                entry.Deserialize(customReader);
                 result.Add(entry);
             }
-            reader.Close();
+            customReader.Reader.Close();
             return true;
         }
         catch (Exception e)
         {
-            reader?.Close();
+            customReader?.Reader.Close();
             LastException = e;
             Console.WriteLine(e.Message);
             Console.WriteLine(e.StackTrace);

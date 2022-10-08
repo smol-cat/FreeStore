@@ -1,9 +1,9 @@
 
-using MySql.Data.MySqlClient;
+using server.Database;
 
 namespace server.Models;
 
 public interface IDeserializable
 {
-    public void Deserialize(MySqlDataReader reader);
+    public void Deserialize(MySqlCustomReader reader);
 }
