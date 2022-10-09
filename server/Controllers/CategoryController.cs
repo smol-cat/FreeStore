@@ -6,7 +6,7 @@ using server.Models.Category;
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/v1/category")]
+[Route("api/v1/categories")]
 public class CategoryController : MainController
 {
 
@@ -38,7 +38,7 @@ public class CategoryController : MainController
     {
         if (string.IsNullOrEmpty(categoryModel.Description) || string.IsNullOrEmpty(categoryModel.Name))
         {
-            return NotAcceptable(new ResponseModel("Fields: description and name are required"));
+            return BadRequest(new ResponseModel("Fields: description and name are required"));
         }
 
         Dictionary<string, object> parameters = new()
@@ -61,7 +61,7 @@ public class CategoryController : MainController
     {
         if (string.IsNullOrEmpty(categoryModel.Description) || string.IsNullOrEmpty(categoryModel.Name))
         {
-            return NotAcceptable(new ResponseModel("Fields: description and name are required"));
+            return BadRequest(new ResponseModel("Fields: description and name are required"));
         }
 
         if (!TryGetCategory(id, out IdCategoryModel idCategoryModel))
@@ -89,9 +89,9 @@ public class CategoryController : MainController
         return Ok(new ResponseModel("Category information has been updated"));
     }
 
-    [HttpDelete]
+    [HttpPatch]
     [Route("{id}")]
-    public IActionResult Delete(int id)
+    public IActionResult Unlist(int id)
     {
         if (!TryGetCategory(id, out IdCategoryModel idCategoryModel))
         {
@@ -108,6 +108,6 @@ public class CategoryController : MainController
             return DatabaseError("Error occured updating category");
         }
 
-        return Ok(new ResponseModel("Category has been removed"));
+        return NoContent();
     }
 }

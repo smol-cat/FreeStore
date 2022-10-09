@@ -7,10 +7,9 @@ using server.Models.Item;
 namespace server.Controllers;
 
 [ApiController]
-[Route("/api/v1/category/{catId}/item")]
+[Route("/api/v1/categories/{catId}/items")]
 public class ItemController : MainController
 {
-
     public static bool TryGetItem(int catId, int id, out DetailedItemModel itemModel)
     {
         itemModel = null;
@@ -81,16 +80,6 @@ public class ItemController : MainController
     [HttpPost]
     public IActionResult PostItem(int catId, ItemModel itemModel)
     {
-        if (itemModel.Price == null)
-        {
-            return NotAcceptable(new ResponseModel("Price is not provided"));
-        }
-
-        if (string.IsNullOrEmpty(itemModel.Title))
-        {
-            return NotAcceptable(new ResponseModel("Title should be included"));
-        }
-
         if (!CategoryController.TryGetCategory(catId, out IdCategoryModel categoryModel))
         {
             return DatabaseError("Could not find category");
@@ -99,6 +88,16 @@ public class ItemController : MainController
         if (categoryModel == null)
         {
             return NotFound(new ResponseModel("Category was not found"));
+        }
+
+        if (itemModel.Price == null || itemModel.Price < 0)
+        {
+            return BadRequest(new ResponseModel("Price is invalid or not provided"));
+        }
+
+        if (string.IsNullOrEmpty(itemModel.Title))
+        {
+            return BadRequest(new ResponseModel("Title should be included"));
         }
 
         int accountId = 1;
@@ -120,22 +119,27 @@ public class ItemController : MainController
     }
 
     [HttpPut]
-    [Route("itId")]
+    [Route("{itId}")]
     public IActionResult EditItem(int catId, int itId, ItemModel itemModel)
     {
-        if (itemModel.Price == null)
+        if (!TryGetItem(catId, itId, out var foundItem))
         {
-            return NotAcceptable(new ResponseModel("Price is not provided"));
+            return DatabaseError("Failed to get an item");
+        }
+
+        if (foundItem == null)
+        {
+            return NotFound(new ResponseModel("Item or category was not found"));
+        }
+
+        if (itemModel.Price == null || itemModel.Price < 0)
+        {
+            return BadRequest(new ResponseModel("Price is invalid or not provided"));
         }
 
         if (string.IsNullOrEmpty(itemModel.Title))
         {
-            return NotAcceptable(new ResponseModel("Title should be included"));
-        }
-
-        if (!TryGetItem(catId, itId, out var _))
-        {
-            return NotFound("Item was not found");
+            return BadRequest(new ResponseModel("Title should be included"));
         }
 
         Dictionary<string, object> parameters = new()
@@ -156,12 +160,32 @@ public class ItemController : MainController
     }
 
     [HttpPatch]
-    [Route("{itId}/changeStatus")]
-    public IActionResult ChangeStatus(int catId, int itId, StatusModel statusModel)
+    [Route("{itId}")]
+    public IActionResult Patch(int catId, int itId, StatusModel statusModel)
     {
-        if (statusModel.Status_id == null)
+        if (!TryGetItem(catId, itId, out var itemModel))
         {
-            return NotAcceptable(new ResponseModel("Status id was not provided"));
+            return DatabaseError("Failed to get an item");
+        }
+
+        if (itemModel == null)
+        {
+            return NotFound(new ResponseModel("Item or category was not found"));
+        }
+
+        if (statusModel.Status_id == null && !(statusModel.Unlist ?? false))
+        {
+            return BadRequest(new ResponseModel("Patch information was not provided"));
+        }
+
+        if (statusModel.Unlist ?? false)
+        {
+            if (!Db.Execute("UPDATE item SET unlisted = 1 WHERE id = @id", new() { ["id"] = itId }))
+            {
+                return DatabaseError("Error occured updating item status");
+            }
+
+            return Ok(new ResponseModel("Item has been unlisted"));
         }
 
         if (!Db.SelectAndDeserialize("SELECT * FROM state WHERE id = @id", new() { ["id"] = statusModel.Status_id }, out var statusList))
@@ -185,33 +209,11 @@ public class ItemController : MainController
             ["state"] = statusModel.Status_id
         };
 
-        if (!Db.Execute("UPDATE item SET fk_state_id = @state WHERE id = @id", parameters))
+        if (!Db.Execute("UPDATE item SET fk_state_id = @state WHERE id = @id AND unlisted = 0", parameters))
         {
             return DatabaseError("Error occured updating item status");
         }
 
         return Ok(new ResponseModel("Item status was updated"));
-    }
-
-    [HttpDelete]
-    [Route("{itId}")]
-    public IActionResult RemoveItem(int catId, int itId)
-    {
-        if (!TryGetItem(catId, itId, out var itemModel))
-        {
-            return DatabaseError("Failed to get an item");
-        }
-
-        if (itemModel == null)
-        {
-            return NotFound(new ResponseModel("Item or category was not found"));
-        }
-
-        if (!Db.Execute("UPDATE item SET unlisted = 1 WHERE id = @id", new() { ["id"] = itId }))
-        {
-            return DatabaseError("Error occured while deleting item");
-        }
-
-        return Ok(new ResponseModel("Item has been successfully removed from the store"));
     }
 }

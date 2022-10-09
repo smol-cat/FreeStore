@@ -6,7 +6,7 @@ using server.Models.Item;
 namespace server.Controllers;
 
 [ApiController]
-[Route("/api/v1/category/{catID}/item/{itId}/image")]
+[Route("/api/v1/categories/{catID}/items/{itId}/images")]
 public class ImageConctroller : MainController
 {
     [HttpPost]

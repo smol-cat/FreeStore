@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace server.Controllers;
 
 [ApiController]
-[Route("/api/v1/category/{catId}/item/{itId}/comment")]
+[Route("/api/v1/categories/{catId}/items/{itId}/comments")]
 public class CommentController : MainController
 {
 
@@ -74,7 +74,7 @@ public class CommentController : MainController
     {
         if (string.IsNullOrEmpty(model.Text))
         {
-            return NotAcceptable("Comment should not be empty");
+            return BadRequest(new ResponseModel("Comment should not be empty"));
         }
 
         if (!ItemController.TryGetItem(catId, itId, out var itemModel))
@@ -107,6 +107,11 @@ public class CommentController : MainController
     [Route("{commId}")]
     public IActionResult Edit(int catId, int itId, int commId, CommentModel model)
     {
+        if (string.IsNullOrEmpty(model.Text))
+        {
+            return BadRequest(new ResponseModel("Comment should not be empty"));
+        }
+
         if (!TryFindComment(catId, itId, commId, out var commentModel))
         {
             return DatabaseError("Error occured trying to find a comment");
@@ -144,6 +149,6 @@ public class CommentController : MainController
             return DatabaseError("Failed to delete the comment");
         }
 
-        return Ok(new ResponseModel("Comment has been deleted"));
+        return NoContent();
     }
 }

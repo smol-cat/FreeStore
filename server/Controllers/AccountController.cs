@@ -6,7 +6,7 @@ using server.Models.Account;
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/v1/account")]
+[Route("api/v1/accounts")]
 public class AccountController : MainController
 {
     [HttpPost]
@@ -15,18 +15,18 @@ public class AccountController : MainController
     {
         if (!Regexes.Email.IsMatch(regForm.Email))
         {
-            return NotAcceptable(new ResponseModel("Email is invalid"));
+            return BadRequest(new ResponseModel("Email is invalid"));
         }
 
         if (Regexes.InvalidName.IsMatch(regForm.Name) || Regexes.InvalidName.IsMatch(regForm.LastName) ||
             string.IsNullOrEmpty(regForm.Name) || string.IsNullOrEmpty(regForm.LastName))
         {
-            return NotAcceptable(new ResponseModel("Name or last name is empty or contain invalid characters"));
+            return BadRequest(new ResponseModel("Name or last name is empty or contain invalid characters"));
         }
 
         if (regForm.Password.Length < 8)
         {
-            return NotAcceptable(new ResponseModel("Password should contain at least 8 characters"));
+            return BadRequest(new ResponseModel("Password should contain at least 8 characters"));
         }
 
         if (!Db.SelectAndDeserialize($"SELECT email FROM account WHERE email = @email", new() { ["email"] = regForm.Email }, out var emails))
@@ -36,7 +36,7 @@ public class AccountController : MainController
 
         if (emails.Any())
         {
-            return NotAcceptable(new ResponseModel("Account with this email already exists"));
+            return BadRequest(new ResponseModel("Account with this email already exists"));
         }
 
         string hash = Utils.SHA256String(regForm.Password);
@@ -55,7 +55,7 @@ public class AccountController : MainController
             return DatabaseError("Failed to create an account");
         }
 
-        return Created($"/api/v1/account/{Db.LastInsertedId}", new ResponseModel());
+        return Created($"/api/v1/account/{Db.LastInsertedId}", new ResponseModel("Account has been created"));
     }
 
 
@@ -71,7 +71,7 @@ public class AccountController : MainController
 
         if (!accounts.Any())
         {
-            return NotAcceptable(new ResponseModel("Account associated with this email is not found"));
+            return BadRequest(new ResponseModel("Account associated with this email is not found"));
         }
 
         var account = accounts.First();
@@ -81,7 +81,7 @@ public class AccountController : MainController
 
         if (!passwordHash.Equals(reqPasswordHash))
         {
-            return NotAcceptable(new ResponseModel("Password is incorrect"));
+            return BadRequest(new ResponseModel("Password is incorrect"));
         }
 
         // var claims = new List<Claim>();
@@ -121,9 +121,9 @@ public class AccountController : MainController
         return Ok(account.First());
     }
 
-    [HttpDelete]
+    [HttpPatch]
     [Route("{id}")]
-    public IActionResult DeleteAccount(int id)
+    public IActionResult BlockAccount(int id)
     {
         if (!Db.SelectAndDeserialize<PersonalAccountModel>($"SELECT * FROM account WHERE id = @id AND is_blocked = 0", new() { ["id"] = id }, out var account))
         {
@@ -140,19 +140,7 @@ public class AccountController : MainController
             return DatabaseError("Error occured while deleting account");
         }
 
-        return Ok(new ResponseModel("Account has been successfully deleted"));
-    }
-
-    [HttpDelete]
-    public async Task<IActionResult> DeleteOwnAccount(LoginModel loginModel)
-    {
-        IActionResult loginResult = await Login(loginModel);
-        if (loginResult is not OkObjectResult)
-        {
-            return loginResult;
-        }
-
-        return DeleteAccount(((PersonalAccountModel)((OkObjectResult)loginResult).Value).Id);
+        return NoContent();
     }
 
     [HttpGet]
@@ -167,9 +155,16 @@ public class AccountController : MainController
     }
 
     [HttpPut]
-    [Route("{id}")]
-    public IActionResult UpdateAccount(int id, ProfileModel profileModel)
+    public IActionResult UpdateAccount(ProfileModel profileModel)
     {
+        int id = 1;
+
+        if (Regexes.InvalidName.IsMatch(profileModel.Name) || Regexes.InvalidName.IsMatch(profileModel.LastName) ||
+            string.IsNullOrEmpty(profileModel.Name) || string.IsNullOrEmpty(profileModel.LastName))
+        {
+            return BadRequest(new ResponseModel("Name or last name is empty or contain invalid characters"));
+        }
+
         if (!Db.SelectAndDeserialize($"SELECT id FROM account WHERE id = {id} AND is_blocked = 0", new() { ["id"] = id }, out var account))
         {
             return DatabaseError("Error occured while searching for account");

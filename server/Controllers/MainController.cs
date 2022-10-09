@@ -13,8 +13,8 @@ public class MainController : ControllerBase
         return base.Ok(value);
     }
 
-    [NonAction]
-    public NotAcceptableObjectResult NotAcceptable(object message = null) => new NotAcceptableObjectResult(message);
+    // [NonAction]
+    // public NotAcceptableObjectResult NotAcceptable(object message = null) => new NotAcceptableObjectResult(message);
 
     [NonAction]
     public ServerErrorObjectResult ServerError(string optionalMessage = null) =>
