@@ -89,7 +89,7 @@ public class CategoryController : MainController
         return Ok(new ResponseModel("Category information has been updated"));
     }
 
-    [HttpPatch]
+    [HttpDelete]
     [Route("{id}")]
     public IActionResult Unlist(int id)
     {

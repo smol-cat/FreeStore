@@ -4,7 +4,7 @@ Allow user to unlist and prevent creating posts under the category
 
 **URL** : `/api/v1/categories/{id}`
 
-**Method** : `PATCH`
+**Method** : `DELETE`
 
 ## Success Responses
 

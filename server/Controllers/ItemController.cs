@@ -173,19 +173,9 @@ public class ItemController : MainController
             return NotFound(new ResponseModel("Item or category was not found"));
         }
 
-        if (statusModel.Status_id == null && !(statusModel.Unlist ?? false))
+        if (statusModel.Status_id == null)
         {
-            return BadRequest(new ResponseModel("Patch information was not provided"));
-        }
-
-        if (statusModel.Unlist ?? false)
-        {
-            if (!Db.Execute("UPDATE item SET unlisted = 1 WHERE id = @id", new() { ["id"] = itId }))
-            {
-                return DatabaseError("Error occured updating item status");
-            }
-
-            return Ok(new ResponseModel("Item has been unlisted"));
+            return BadRequest(new ResponseModel("Status information was not provided"));
         }
 
         if (!Db.SelectAndDeserialize("SELECT * FROM state WHERE id = @id", new() { ["id"] = statusModel.Status_id }, out var statusList))
@@ -215,5 +205,27 @@ public class ItemController : MainController
         }
 
         return Ok(new ResponseModel("Item status was updated"));
+    }
+
+    [HttpDelete]
+    [Route("{itId}")]
+    public IActionResult Delete(int catId, int itId)
+    {
+        if (!TryGetItem(catId, itId, out var itemModel))
+        {
+            return DatabaseError("Failed to get an item");
+        }
+
+        if (itemModel == null)
+        {
+            return NotFound(new ResponseModel("Item or category was not found"));
+        }
+
+        if (!Db.Execute("UPDATE item SET unlisted = 1 WHERE id = @id", new() { ["id"] = itId }))
+        {
+            return DatabaseError("Error occured updating item status");
+        }
+
+        return Ok(new ResponseModel("Item has been unlisted"));
     }
 }

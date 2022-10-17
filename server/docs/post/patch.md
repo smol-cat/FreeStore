@@ -1,4 +1,4 @@
-# Unlist or update post status
+# Update post status
 
 Allow user to unlist or change status of a post
 
@@ -8,28 +8,17 @@ Allow user to unlist or change status of a post
 
 **Data constraints**
 
-- At least one of these fields are required;
-- If `unlist` field has true value, item will be unlisted without changing its state;
-- If `unlist` is false or it is not provided, item state will be changed with provided `status_id`.
+- Status id field is required;
 
 ```json
 {
     "status_id": 2,
-    "unlist": true
 }
 ```
 
 ## Success Responses
 
 **Code** : `200 OK`
-
-If item is unlisted following message will be returned:
-
-```json
-{
-    "message": "Item has been unlisted"
-}
-```
 
 If item status was updated following message will be returned:
 
@@ -52,10 +41,10 @@ If requested with identifiers with which no category or item is associated or on
 ```
 **Code** : `400 Bad Request`
 
-If no fields were provided or there is only `unlist` token with value `false` following message will be returned:
+If no fields were provided following message will be returned:
 
 ```json
 {
-    "message": "Patch information was not provided"
+    "message": "Status information was not provided"
 }
 ```

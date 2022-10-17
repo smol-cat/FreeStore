@@ -20,7 +20,7 @@ Currently all endpoints are open since there is no authentication/authorization 
 * [List of categories](docs/category/get_list.md) : `GET /api/v1/categories`
 * [Create new category](docs/category/post.md) : `POST /api/v1/categories`
 * [Edit category](docs/category/put.md) : `PUT /api/v1/categories/{id}`
-* [Unlist category](docs/category/patch.md) : `PATCH /api/v1/categories/{id}`
+* [Delete category](docs/category/patch.md) : `DELETE /api/v1/categories/{id}`
 
 ### Posts related
 
@@ -28,7 +28,8 @@ Currently all endpoints are open since there is no authentication/authorization 
 * [Get post by id](docs/post/get.md) : `GET /api/v1/categories/{id}/item/{id}`
 * [Create new post](docs/post/post.md) : `POST /api/v1/categories/{id}/item/`
 * [Edit post](docs/post/put.md) : `PUT /api/v1/categories/{id}/item/`
-* [Unlist or change status](docs/post/patch.md) : `PATCH /api/v1/categories/{id}/item/{id}`
+* [Change post status](docs/post/patch.md) : `PATCH /api/v1/categories/{id}/item/{id}`
+* [Delete post](docs/post/delete.md) : `DELETE /api/v1/categories/{id}/item/{id}`
 
 ### Comments related
 
