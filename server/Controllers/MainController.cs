@@ -1,4 +1,5 @@
 
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using server.Controllers.ObjectResults;
 using server.Database;
@@ -6,7 +7,14 @@ using server.Database;
 namespace server.Controllers;
 public class MainController : ControllerBase
 {
-    protected static DbConnection Db = DbConnection.Instance;
+    protected static DbConnection Db;
+    protected string UserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
+    protected string UserRole => User.FindFirstValue(ClaimTypes.Role);
+
+    public MainController(DbConnection db)
+    {
+        Db = db;
+    }
 
     public override OkObjectResult Ok(object? value)
     {
@@ -21,5 +29,5 @@ public class MainController : ControllerBase
         new ServerErrorObjectResult(new ServerErrorModel(optionalMessage));
 
     public ServerErrorObjectResult DatabaseError(string optionalMessage = null) =>
-        new ServerErrorObjectResult(new ServerErrorModel(DbConnection.Instance.LastException.Message, optionalMessage, DbConnection.Instance.LastException.StackTrace));
+        new ServerErrorObjectResult(new ServerErrorModel(Db.LastException.Message, optionalMessage, Db.LastException.StackTrace));
 }

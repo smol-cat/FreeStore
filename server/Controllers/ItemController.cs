@@ -1,6 +1,9 @@
 
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using server.Database;
+using server.Models.Authentication;
 using server.Models.Category;
 using server.Models.Item;
 
@@ -8,8 +11,13 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("/api/v1/categories/{catId}/items")]
+[Authorize(Roles = Role.Everyone)]
 public class ItemController : MainController
 {
+    public ItemController(DbConnection db) : base(db)
+    {
+    }
+
     public static bool TryGetItem(int catId, int id, out DetailedItemModel itemModel)
     {
         itemModel = null;
@@ -100,14 +108,13 @@ public class ItemController : MainController
             return BadRequest(new ResponseModel("Title should be included"));
         }
 
-        int accountId = 1;
         Dictionary<string, object> parameters = new()
         {
             ["title"] = itemModel.Title,
             ["description"] = itemModel.Description,
             ["price"] = itemModel.Price,
             ["fk_category_id"] = catId,
-            ["fk_account_id"] = accountId
+            ["fk_account_id"] = UserId
         };
 
         if (!Db.Execute("INSERT INTO item (title, description, price, fk_category_id, fk_account_id) VALUES (@title, @description, @price, @fk_category_id, @fk_account_id)", parameters))
@@ -132,6 +139,11 @@ public class ItemController : MainController
             return NotFound(new ResponseModel("Item or category was not found"));
         }
 
+        if (foundItem.Account.Id.ToString() != UserId)
+        {
+            return Forbid();
+        }
+
         if (itemModel.Price == null || itemModel.Price < 0)
         {
             return BadRequest(new ResponseModel("Price is invalid or not provided"));
@@ -142,43 +154,12 @@ public class ItemController : MainController
             return BadRequest(new ResponseModel("Title should be included"));
         }
 
-        Dictionary<string, object> parameters = new()
+        if (itemModel.Status_id == null)
         {
-            ["id"] = itId,
-            ["title"] = itemModel.Title,
-            ["description"] = itemModel.Description,
-            ["price"] = itemModel.Price,
-            ["fk_category_id"] = itemModel.CategoryId ?? catId,
-        };
-
-        if (!Db.Execute("UPDATE item SET title = @title, description = @description, fk_category_id = @fk_category_id WHERE id = @id", parameters))
-        {
-            return DatabaseError("Error occured trying to update item");
+            return BadRequest(new ResponseModel("Status id is empty or not provided"));
         }
 
-        return Ok(new ResponseModel("Item information has been updated"));
-    }
-
-    [HttpPatch]
-    [Route("{itId}")]
-    public IActionResult Patch(int catId, int itId, StatusModel statusModel)
-    {
-        if (!TryGetItem(catId, itId, out var itemModel))
-        {
-            return DatabaseError("Failed to get an item");
-        }
-
-        if (itemModel == null)
-        {
-            return NotFound(new ResponseModel("Item or category was not found"));
-        }
-
-        if (statusModel.Status_id == null)
-        {
-            return BadRequest(new ResponseModel("Status information was not provided"));
-        }
-
-        if (!Db.SelectAndDeserialize("SELECT * FROM state WHERE id = @id", new() { ["id"] = statusModel.Status_id }, out var statusList))
+        if (!Db.SelectAndDeserialize("SELECT * FROM state WHERE id = @id", new() { ["id"] = itemModel.Status_id }, out var statusList))
         {
             return DatabaseError("Failed to fetch list of states");
         }
@@ -188,23 +169,22 @@ public class ItemController : MainController
             return NotFound(new ResponseModel("Provided item state was not found"));
         }
 
-        if (!TryGetItem(catId, itId, out var _))
-        {
-            return NotFound("Item or item category was not found");
-        }
-
         Dictionary<string, object> parameters = new()
         {
             ["id"] = itId,
-            ["state"] = statusModel.Status_id
+            ["title"] = itemModel.Title,
+            ["description"] = itemModel.Description,
+            ["price"] = itemModel.Price,
+            ["fk_category_id"] = itemModel.Category_Id ?? catId,
+            ["state"] = itemModel.Status_id
         };
 
-        if (!Db.Execute("UPDATE item SET fk_state_id = @state WHERE id = @id AND unlisted = 0", parameters))
+        if (!Db.Execute("UPDATE item SET title = @title, description = @description, fk_category_id = @fk_category_id, fk_state_id = @state WHERE id = @id", parameters))
         {
-            return DatabaseError("Error occured updating item status");
+            return DatabaseError("Error occured trying to update item");
         }
 
-        return Ok(new ResponseModel("Item status was updated"));
+        return Ok(new ResponseModel("Item information has been updated"));
     }
 
     [HttpDelete]
@@ -219,6 +199,11 @@ public class ItemController : MainController
         if (itemModel == null)
         {
             return NotFound(new ResponseModel("Item or category was not found"));
+        }
+
+        if (itemModel.Account.Id.ToString() != UserId && !User.IsInRole(Role.Admin))
+        {
+            return Forbid();
         }
 
         if (!Db.Execute("UPDATE item SET unlisted = 1 WHERE id = @id", new() { ["id"] = itId }))

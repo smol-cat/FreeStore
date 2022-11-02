@@ -1,13 +1,20 @@
 
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using server.Database;
+using server.Models.Authentication;
 
 namespace server.Controllers;
 
 [ApiController]
 [Route("/api/v1/categories/{catId}/items/{itId}/comments")]
+[Authorize(Roles = Role.Everyone)]
 public class CommentController : MainController
 {
+    public CommentController(DbConnection db) : base(db)
+    {
+    }
 
     public static bool TryFindComment(int catId, int itId, int commId, out DetailedCommentModel model)
     {
@@ -22,7 +29,7 @@ public class CommentController : MainController
             return true;
         }
 
-        if (!Db.SelectAndDeserialize<DetailedCommentModel>("SELECT * FROM detailed_comment WHERE id = @commId", new() { ["commId"] = commId }, out var comments))
+        if (!Db.SelectAndDeserialize<DetailedCommentModel>("SELECT * FROM detailed_comment WHERE id = @commId AND item_id = @itId", new() { ["commId"] = commId, ["itId"] = itId }, out var comments))
         {
             return false;
         }
@@ -90,7 +97,7 @@ public class CommentController : MainController
         Dictionary<string, object> parameters = new()
         {
             ["text"] = model.Text,
-            ["fk_account_id"] = 1,
+            ["fk_account_id"] = UserId,
             ["fk_item_id"] = itId,
             ["date_created"] = DateTime.Now.ToString(Globals.MySqlDateFormat),
         };
@@ -122,6 +129,11 @@ public class CommentController : MainController
             return NotFound(new ResponseModel("Comment was not found"));
         }
 
+        if (commentModel.Account.Id.ToString() != UserId)
+        {
+            return Forbid();
+        }
+
         if (!Db.Execute("UPDATE comment SET text = @text WHERE id = @id", new() { ["text"] = model.Text, ["id"] = commId }))
         {
             return DatabaseError("Failed to update the comment");
@@ -142,6 +154,11 @@ public class CommentController : MainController
         if (commentModel == null)
         {
             return NotFound(new ResponseModel("Comment was not found"));
+        }
+
+        if (commentModel.Account.Id.ToString() != UserId && !User.IsInRole(Role.Admin))
+        {
+            return Forbid();
         }
 
         if (!Db.Execute("DELETE FROM comment WHERE id = @id", new() { ["id"] = commId }))

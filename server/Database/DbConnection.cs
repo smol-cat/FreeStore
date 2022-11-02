@@ -1,21 +1,14 @@
 
 
+using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using server.Models;
 
 namespace server.Database;
 
-public class DbConnection
+public class DbConnection : DbContext
 {
-    public static string Server = "localhost";
-    public static int Port = 3306;
-    public static string DataBaseName = "free_store";
-    public static string UserName = "smol_cat";
-    public static string Password = "2448";
-
-    MySqlConnection conn = new MySqlConnection($"server={Server};port={Port};database={DataBaseName};username={UserName};password={Password};");
-    private static DbConnection _instance = new DbConnection();
-
+    private static MySqlConnection conn;
     public Exception LastException { get; private set; }
 
     private Dictionary<Type, MySqlDbType> TypeMap = new()
@@ -30,17 +23,13 @@ public class DbConnection
         [typeof(double)] = MySqlDbType.Double
     };
 
-    private DbConnection()
+    public DbConnection(IConfiguration configuration)
     {
-        conn.Open();
-        Console.WriteLine($"MySQL version : {conn.ServerVersion}");
-    }
-
-    public static DbConnection Instance
-    {
-        get
+        if (conn == null)
         {
-            return _instance;
+            conn = new MySqlConnection($"server={configuration["DB:host"]};port=3306;database={configuration["DB:database"]};username={configuration["DB:username"]};password={configuration["DB:password"]};");
+            conn.Open();
+            Console.WriteLine($"MySQL version : {conn.ServerVersion}");
         }
     }
 

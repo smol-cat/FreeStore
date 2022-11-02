@@ -35,6 +35,7 @@ public class DetailedItemModel : IDeserializable
             Id = (int)reader["account_id"],
             Name = (string)reader["account_name"],
             Last_name = (string)reader["account_last_name"],
+            Level = (int?)reader["account_level"]
         };
 
         State = new StateModel

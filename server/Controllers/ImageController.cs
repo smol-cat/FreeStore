@@ -1,6 +1,7 @@
 
 
 using Microsoft.AspNetCore.Mvc;
+using server.Database;
 using server.Models.Item;
 
 namespace server.Controllers;
@@ -9,6 +10,10 @@ namespace server.Controllers;
 [Route("/api/v1/categories/{catID}/items/{itId}/images")]
 public class ImageConctroller : MainController
 {
+    public ImageConctroller(DbConnection db) : base(db)
+    {
+    }
+
     [HttpPost]
     public IActionResult Post(int catId, int itId, IFormFile image)
     {

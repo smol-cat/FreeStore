@@ -21,6 +21,7 @@ public class DetailedCommentModel : IDeserializable
             Id = (int)reader["account_id"],
             Name = (string)reader["name"],
             Last_name = (string)reader["last_name"],
+            Level = (int)reader["account_level"]
         };
     }
 }

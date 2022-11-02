@@ -1,14 +1,21 @@
 
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using server.Database;
+using server.Models.Authentication;
 using server.Models.Category;
 
 namespace server.Controllers;
 
 [ApiController]
 [Route("api/v1/categories")]
+[Authorize(Roles = Role.Everyone)]
 public class CategoryController : MainController
 {
+    public CategoryController(DbConnection db) : base(db)
+    {
+    }
 
     public static bool TryGetCategory(int id, out IdCategoryModel category)
     {
@@ -34,6 +41,7 @@ public class CategoryController : MainController
     }
 
     [HttpPost]
+    [Authorize(Roles = Role.Admin)]
     public IActionResult Add(CategoryModel categoryModel)
     {
         if (string.IsNullOrEmpty(categoryModel.Description) || string.IsNullOrEmpty(categoryModel.Name))
@@ -57,6 +65,7 @@ public class CategoryController : MainController
 
     [HttpPut]
     [Route("{id}")]
+    [Authorize(Roles = Role.Admin)]
     public IActionResult Update(int id, CategoryModel categoryModel)
     {
         if (string.IsNullOrEmpty(categoryModel.Description) || string.IsNullOrEmpty(categoryModel.Name))
@@ -91,6 +100,7 @@ public class CategoryController : MainController
 
     [HttpDelete]
     [Route("{id}")]
+    [Authorize(Roles = Role.Admin)]
     public IActionResult Unlist(int id)
     {
         if (!TryGetCategory(id, out IdCategoryModel idCategoryModel))

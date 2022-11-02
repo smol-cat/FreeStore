@@ -13,6 +13,16 @@ public class MySqlCustomReader
 
     public object this[string key]
     {
-        get => Reader[key] is DBNull ? null : Reader[key];
+        get
+        {
+            try
+            {
+                return Reader[key] is DBNull ? null : Reader[key];
+            }
+            catch (Exception _)
+            {
+                return null;
+            }
+        }
     }
 }
