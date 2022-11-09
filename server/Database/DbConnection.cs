@@ -9,6 +9,7 @@ namespace server.Database;
 public class DbConnection : DbContext
 {
     private static MySqlConnection conn;
+    private static string _connectionString;
     public Exception LastException { get; private set; }
 
     private Dictionary<Type, MySqlDbType> TypeMap = new()
@@ -27,9 +28,10 @@ public class DbConnection : DbContext
     {
         if (conn == null)
         {
-            conn = new MySqlConnection($"server={configuration["DB:host"]};port=3306;database={configuration["DB:database"]};username={configuration["DB:username"]};password={configuration["DB:password"]};");
+            _connectionString = $"server={configuration["DB:host"]};port=3306;database={configuration["DB:database"]};username={configuration["DB:username"]};password={configuration["DB:password"]};";
+            conn = new MySqlConnection(_connectionString);
             conn.Open();
-            Console.WriteLine($"MySQL version : {conn.ServerVersion}");
+            Console.WriteLine($"MySQL version : {conn?.ServerVersion}");
         }
     }
 
@@ -41,6 +43,18 @@ public class DbConnection : DbContext
         MySqlCustomReader reader = new MySqlCustomReader(cmd.ExecuteReader());
         LastInsertedId = cmd.LastInsertedId;
         return reader;
+    }
+
+    private bool HandleException(Exception e){
+        if(Regexes.RestartDatabase.IsMatch(e.Message)){
+            conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            return true;
+        }
+        LastException = e;
+        Console.WriteLine(e.Message);
+        Console.WriteLine(e.StackTrace);
+        return false;
     }
 
     public bool Execute(string query, Dictionary<string, object> parameters)
@@ -57,10 +71,16 @@ public class DbConnection : DbContext
         }
         catch (Exception e)
         {
-            LastException = e;
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
-            return false;
+            if(!HandleException(e)){
+                return false;
+            }
+            using var cmd = new MySqlCommand();
+            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+            cmd.Connection = conn;
+            cmd.CommandText = query;
+            cmd.ExecuteNonQuery();
+            LastInsertedId = cmd.LastInsertedId;
+            return true;
         }
     }
 
@@ -89,11 +109,26 @@ public class DbConnection : DbContext
         }
         catch (Exception e)
         {
+            if(!HandleException(e)){
+                return false;
+            }
             customReader?.Reader.Close();
-            LastException = e;
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
-            return false;
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.CommandText = query;
+            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+            customReader = ExecuteQuery(cmd);
+            var reader = customReader.Reader;
+            while (reader.Read())
+            {
+                var entry = new Dictionary<string, object>();
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    entry[reader.GetName(i)] = reader.GetValue(i);
+                }
+                result.Add(entry);
+            }
+            reader.Close();
+            return true;
         }
     }
 
@@ -118,11 +153,21 @@ public class DbConnection : DbContext
         }
         catch (Exception e)
         {
-            customReader?.Reader.Close();
-            LastException = e;
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
-            return false;
+            if(!HandleException(e)){
+                return false;
+            }
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.CommandText = query;
+            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+            customReader = ExecuteQuery(cmd);
+            while (customReader.Reader.Read())
+            {
+                T entry = new();
+                entry.Deserialize(customReader);
+                result.Add(entry);
+            }
+            customReader.Reader.Close();
+            return true;
         }
     }
 }

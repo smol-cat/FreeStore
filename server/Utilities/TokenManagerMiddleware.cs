@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Primitives;
 using server.Database;
 
 namespace server.Utilities;
@@ -26,8 +27,10 @@ public class TokenManagerMiddleware
             conn = connection;
             Console.WriteLine("DB initialized");
         }
+        
+        var endpoint = context.GetEndpoint();
 
-        if (!context.GetEndpoint().Metadata.Any(e => e is AuthorizeAttribute))
+        if (!endpoint?.Metadata.Any(e => e is AuthorizeAttribute) ?? true)
         {
             await _next(context);
             return;
@@ -43,6 +46,7 @@ public class TokenManagerMiddleware
 
         if (cache.IsBlocked(token))
         {
+            context.Response.Headers.Add("WWW-Authenticate", @"Bearer error=""invalid_token""");
             context.Response.StatusCode = 401;
             return;
         }

@@ -16,7 +16,6 @@ public class AccountController : MainController
     }
 
     [HttpPost]
-    [Route("register")]
     public IActionResult Register(RegistrationModel regForm)
     {
         if (!Regexes.Email.IsMatch(regForm.Email))
@@ -61,7 +60,7 @@ public class AccountController : MainController
             return DatabaseError("Failed to create an account");
         }
 
-        return Created($"/api/v1/account/{Db.LastInsertedId}", new ResponseModel("Account has been created"));
+        return Created($"/api/v1/accounts/{Db.LastInsertedId}", new ResponseModel("Account has been created"));
     }
 
     [HttpGet]

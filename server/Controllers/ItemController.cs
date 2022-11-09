@@ -50,7 +50,7 @@ public class ItemController : MainController
     [HttpGet]
     [Route("{itId}")]
     public IActionResult Get(int catId, int itId)
-    {
+    { 
         if (!TryGetItem(catId, itId, out var itemModel))
         {
             return DatabaseError("Failed to get an item");
@@ -58,7 +58,7 @@ public class ItemController : MainController
 
         if (itemModel == null)
         {
-            return NotFound(new ResponseModel("Item or category was not found"));
+            return NotFound(new ResponseModel("Item or category was notfound"));
         }
 
         return Ok(itemModel);

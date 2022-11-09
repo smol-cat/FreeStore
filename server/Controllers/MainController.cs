@@ -16,6 +16,7 @@ public class MainController : ControllerBase
         Db = db;
     }
 
+    [NonAction]
     public override OkObjectResult Ok(object? value)
     {
         return base.Ok(value);
@@ -28,6 +29,7 @@ public class MainController : ControllerBase
     public ServerErrorObjectResult ServerError(string optionalMessage = null) =>
         new ServerErrorObjectResult(new ServerErrorModel(optionalMessage));
 
+    [NonAction]
     public ServerErrorObjectResult DatabaseError(string optionalMessage = null) =>
         new ServerErrorObjectResult(new ServerErrorModel(Db.LastException.Message, optionalMessage, Db.LastException.StackTrace));
 }
