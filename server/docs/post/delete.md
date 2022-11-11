@@ -6,6 +6,10 @@ Allow user to delete a comment under certain post.
 
 **Method** : `DELETE`
 
+**Auth required** : YES
+
+**Permissions required** : Admin, Resource is owned by user
+
 ## Success Responses
 
 **Code** : `204 No Content`

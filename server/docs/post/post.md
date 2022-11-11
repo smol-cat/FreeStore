@@ -6,6 +6,10 @@ Allow user to create a new post
 
 **Method** : `POST`
 
+**Auth required** : YES
+
+**Permissions required** : None
+
 **Data constraints**
 
 - All fields are provided;

@@ -6,6 +6,10 @@ Allow user to get a list of posts of specific category.
 
 **Method** : `GET`
 
+**Auth required** : YES
+
+**Permissions required** : None
+
 ## Success Responses
 
 **Code** : `200 OK`

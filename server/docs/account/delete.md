@@ -4,7 +4,11 @@ Allow user to block an account
 
 **URL** : `/api/v1/accounts/{id}`
 
-**Method** : `PATCH`
+**Method** : `DELETE`
+
+**Auth required** : YES
+
+**Permissions required** : Admin, User is account owner
 
 ## Success Responses
 

@@ -6,6 +6,10 @@ Allow user to edit a post
 
 **Method** : `PUT`
 
+**Auth required** : YES
+
+**Permissions required** : Resource is owned by user
+
 **Data constraints**
 
 - All fields are provided;
@@ -16,7 +20,9 @@ Allow user to edit a post
 {
     "title": "Naujas kompiuteris",
     "description": "Lenovo Legion Y580 GTX RTX...",
-    "price": 2000
+    "price": 2000,
+    "status_id": 1,
+    "category_id": 2
 }
 ```
 
@@ -37,7 +43,7 @@ If all validation requirements are met - success response.
 
 **Code** : `404 Not Found`
 
-If provided category and item id does not exist following message will be returned:
+If provided category or item id does not exist following message will be returned:
 
 ```json
 {
@@ -62,6 +68,14 @@ If price is not provided, null or negative:
 ```json
 {
     "message": "Price is invalid or not provided"
+}
+```
+
+If status information is not provided, null or negative:
+
+```json
+{
+    "message": "Status id is empty or not provided"
 }
 ```
 

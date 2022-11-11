@@ -6,6 +6,10 @@ Allow user to edit their account details
 
 **Method** : `PUT`
 
+**Auth required** : YES
+
+**Permissions required** : User is account owner
+
 **Data constraints**
 
 Provide all required fields.

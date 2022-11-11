@@ -2,9 +2,11 @@
 
 Allow user to login to their account
 
-**URL** : `/api/v1/accounts/login`
+**URL** : `/api/v1/tokens`
 
 **Method** : `POST`
+
+**Auth required** : NO
 
 **Data constraints**
 
@@ -19,7 +21,7 @@ Provide correct email and password.
 
 ## Success Responses
 
-**Code** : `200 OK`
+**Code** : `204 Created`
 
 **Content example** : 
 
@@ -27,7 +29,7 @@ If email and password are correct you will be logged in to your account
 
 ```json
 {
-    "message": "You've logged in"
+    "token": "{jwt token}"
 }
 ```
 ## Error responses

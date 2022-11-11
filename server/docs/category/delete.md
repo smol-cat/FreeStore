@@ -6,6 +6,10 @@ Allow user to unlist and prevent creating posts under the category
 
 **Method** : `DELETE`
 
+**Auth required** : YES
+
+**Permissions required** : Admin
+
 ## Success Responses
 
 **Code** : `204 No Content`

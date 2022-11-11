@@ -6,6 +6,10 @@ Allow user to get a list of all registered accounts.
 
 **Method** : `GET`
 
+**Auth required** : YES
+
+**Permissions required** : Admin
+
 ## Success Responses
 
 **Code** : `200 OK`

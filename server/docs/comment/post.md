@@ -6,6 +6,10 @@ Allow user to create a new comment
 
 **Method** : `POST`
 
+**Auth required** : YES
+
+**Permissions required** : None
+
 **Data constraints**
 
 - Text field is provided;

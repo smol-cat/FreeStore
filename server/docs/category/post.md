@@ -6,6 +6,10 @@ Allow user to create a new category
 
 **Method** : `POST`
 
+**Auth required** : YES
+
+**Permissions required** : Admin
+
 **Data constraints**
 
 - All fields are provided;

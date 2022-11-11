@@ -6,6 +6,8 @@ Allow user to register to the system
 
 **Method** : `POST`
 
+**Auth required** : NO
+
 **Data constraints**
 
 - All fields are provided;

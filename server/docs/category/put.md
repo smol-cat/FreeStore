@@ -6,6 +6,10 @@ Allow user to edit category information
 
 **Method** : `PUT`
 
+**Auth required** : YES
+
+**Permissions required** : Admin
+
 **Data constraints**
 
 - All fields are provided;

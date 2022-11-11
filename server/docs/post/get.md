@@ -6,6 +6,10 @@ Allow user to get information of a specific post.
 
 **Method** : `GET`
 
+**Auth required** : YES
+
+**Permissions required** : None
+
 ## Success Responses
 
 **Code** : `200 OK`

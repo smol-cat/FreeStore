@@ -6,6 +6,10 @@ Allow user to get a list of comments under a post.
 
 **Method** : `GET`
 
+**Auth required** : YES
+
+**Permissions required** : None
+
 ## Success Responses
 
 **Code** : `200 OK`

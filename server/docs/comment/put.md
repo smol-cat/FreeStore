@@ -6,6 +6,10 @@ Allow user to edit a comment
 
 **Method** : `PUT`
 
+**Auth required** : YES
+
+**Permissions required** : Resource is owned by user
+
 **Data constraints**
 
 - Text field is provided;
