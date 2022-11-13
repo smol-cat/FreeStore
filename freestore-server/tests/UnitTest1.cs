@@ -1,22 +1,22 @@
-using Xunit;
+using NUnit.Framework;
 using server.Database;
-using System;
 
 namespace tests;
 
-public class UnitTest1
+public class DatabaseTests
 {
-    [Fact]
-    public void DatabaseConnectionTest()
+
+    private DbConnection dbConnection;
+
+    [SetUp]
+    public void Setup()
     {
-        try
-        {
-            var dbConnection = new DbConnection($"server={Globals.Host};port={Globals.Port};database={Globals.Database};username={Globals.Username};password={Globals.Password};");
-            Assert.True(true, "Database has connected");
-        }
-        catch (Exception)
-        {
-            Assert.True(false, "Database failed to connect");
-        }
+        dbConnection = new DbConnection($"server={Globals.Host};port={Globals.Port};database={Globals.Database};username={Globals.Username};password={Globals.Password};");
+    }
+
+    [Test]
+    public void Test1()
+    {
+        Assert.Pass();
     }
 }
