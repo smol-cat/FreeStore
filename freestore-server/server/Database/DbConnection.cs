@@ -35,6 +35,13 @@ public class DbConnection : DbContext
         }
     }
 
+    public DbConnection(string connectionString)
+    {
+        _connectionString = connectionString;
+        conn = new MySqlConnection(_connectionString);
+        conn.Open();
+    }
+
     public long LastInsertedId { get; private set; }
 
     private MySqlCustomReader ExecuteQuery(MySqlCommand cmd)
@@ -157,7 +164,7 @@ public class DbConnection : DbContext
         {
             result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
         }
-        catch
+        catch(Exception e)
         {
             if (!HandleException(e))
             {
