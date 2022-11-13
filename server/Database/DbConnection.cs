@@ -45,8 +45,10 @@ public class DbConnection : DbContext
         return reader;
     }
 
-    private bool HandleException(Exception e){
-        if(Regexes.RestartDatabase.IsMatch(e.Message)){
+    private bool HandleException(Exception e)
+    {
+        if (Regexes.RestartDatabase.IsMatch(e.Message))
+        {
             conn = new MySqlConnection(_connectionString);
             conn.Open();
             return true;
@@ -57,79 +59,94 @@ public class DbConnection : DbContext
         return false;
     }
 
+    private void ExecuteLogic(string query, Dictionary<string, object> parameters)
+    {
+        using var cmd = new MySqlCommand();
+        parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+        cmd.Connection = conn;
+        cmd.CommandText = query;
+        cmd.ExecuteNonQuery();
+        LastInsertedId = cmd.LastInsertedId;
+    }
+
     public bool Execute(string query, Dictionary<string, object> parameters)
     {
         try
         {
-            using var cmd = new MySqlCommand();
-            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-            cmd.Connection = conn;
-            cmd.CommandText = query;
-            cmd.ExecuteNonQuery();
-            LastInsertedId = cmd.LastInsertedId;
-            return true;
+            ExecuteLogic(query, parameters);
         }
         catch (Exception e)
         {
-            if(!HandleException(e)){
+            if (!HandleException(e))
+            {
                 return false;
             }
-            using var cmd = new MySqlCommand();
-            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-            cmd.Connection = conn;
-            cmd.CommandText = query;
-            cmd.ExecuteNonQuery();
-            LastInsertedId = cmd.LastInsertedId;
-            return true;
+
+            ExecuteLogic(query, parameters);
         }
+
+        return true;
+    }
+
+    private List<Dictionary<string, object>> SelectAndDeserializeLogic(string query, Dictionary<string, object> parameters, MySqlCustomReader customReader)
+    {
+        List<Dictionary<string, object>> result = new();
+        MySqlCommand cmd = new MySqlCommand();
+        cmd.CommandText = query;
+        parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+        customReader = ExecuteQuery(cmd);
+        var reader = customReader.Reader;
+        while (reader.Read())
+        {
+            var entry = new Dictionary<string, object>();
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                entry[reader.GetName(i)] = reader.GetValue(i);
+            }
+            result.Add(entry);
+        }
+        reader.Close();
+        return result;
     }
 
     public bool SelectAndDeserialize(string query, Dictionary<string, object> parameters, out List<Dictionary<string, object>> result)
     {
         result = new();
         MySqlCustomReader customReader = null;
+
         try
         {
-            MySqlCommand cmd = new MySqlCommand();
-            cmd.CommandText = query;
-            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-            customReader = ExecuteQuery(cmd);
-            var reader = customReader.Reader;
-            while (reader.Read())
-            {
-                var entry = new Dictionary<string, object>();
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    entry[reader.GetName(i)] = reader.GetValue(i);
-                }
-                result.Add(entry);
-            }
-            reader.Close();
-            return true;
+            result = SelectAndDeserializeLogic(query, parameters, customReader);
         }
         catch (Exception e)
         {
-            if(!HandleException(e)){
+            if (!HandleException(e))
+            {
                 return false;
             }
+
             customReader?.Reader.Close();
-            MySqlCommand cmd = new MySqlCommand();
-            cmd.CommandText = query;
-            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-            customReader = ExecuteQuery(cmd);
-            var reader = customReader.Reader;
-            while (reader.Read())
-            {
-                var entry = new Dictionary<string, object>();
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    entry[reader.GetName(i)] = reader.GetValue(i);
-                }
-                result.Add(entry);
-            }
-            reader.Close();
-            return true;
+            result = SelectAndDeserializeLogic(query, parameters, customReader);
         }
+
+        return true;
+    }
+
+    private List<T> SelectAndDeserializeLogic<T>(string query, Dictionary<string, object> parameters, MySqlCustomReader customReader) where T : IDeserializable, new()
+    {
+        List<T> result = new();
+        MySqlCommand cmd = new MySqlCommand();
+        cmd.CommandText = query;
+        parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+        customReader = ExecuteQuery(cmd);
+        while (customReader.Reader.Read())
+        {
+            T entry = new();
+            entry.Deserialize(customReader);
+            result.Add(entry);
+        }
+        customReader.Reader.Close();
+        return result;
     }
 
     public bool SelectAndDeserialize<T>(string query, Dictionary<string, object> parameters, out List<T> result) where T : IDeserializable, new()
@@ -138,36 +155,18 @@ public class DbConnection : DbContext
         result = new();
         try
         {
-            MySqlCommand cmd = new MySqlCommand();
-            cmd.CommandText = query;
-            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-            customReader = ExecuteQuery(cmd);
-            while (customReader.Reader.Read())
-            {
-                T entry = new();
-                entry.Deserialize(customReader);
-                result.Add(entry);
-            }
-            customReader.Reader.Close();
-            return true;
+            result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
         }
-        catch (Exception e)
+        catch
         {
-            if(!HandleException(e)){
+            if (!HandleException(e))
+            {
                 return false;
             }
-            MySqlCommand cmd = new MySqlCommand();
-            cmd.CommandText = query;
-            parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-            customReader = ExecuteQuery(cmd);
-            while (customReader.Reader.Read())
-            {
-                T entry = new();
-                entry.Deserialize(customReader);
-                result.Add(entry);
-            }
-            customReader.Reader.Close();
-            return true;
+
+            customReader?.Reader.Close();
+            result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
         }
+        return true;
     }
 }
