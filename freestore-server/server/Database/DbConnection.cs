@@ -34,14 +34,6 @@ public class DbConnection : DbContext
             Console.WriteLine($"MySQL version : {conn?.ServerVersion}");
         }
     }
-
-    public DbConnection(string connectionString)
-    {
-        _connectionString = connectionString;
-        conn = new MySqlConnection(_connectionString);
-        conn.Open();
-    }
-
     public long LastInsertedId { get; private set; }
 
     private MySqlCustomReader ExecuteQuery(MySqlCommand cmd)
