@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Google.Protobuf.WellKnownTypes;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using Org.BouncyCastle.Asn1.Cms;
 using server.Database;
 using server.Models.Category;
 using tests.utils;
@@ -141,6 +138,7 @@ public class DatabaseTests
     [TestCase("SELECT id, name FROM category", new string[0], new object[0]  ,new string[] { "id", "name"})]
     [TestCase("SELECT id, price, title FROM item WHERE fk_category_id = @id", new string[] { "id" }, new object[] { 1 }, new string[] { "id", "price", "title"})]
     [TestCase("SELECT text, date_created FROM comment", new string[0], new object[0], new string[] { "text", "date_created" })]
+    [TestCase($"SELECT id, is_blocked FROM account WHERE id = @id AND is_blocked = @blocked", new string[] { "id", "blocked" }, new object[] { 1, 0 }, new string[] { "id", "is_blocked" })]
     public void Select_To_Dictionary_Contains_Requested_Entries(string query, string[] keys, object[] values, string[] expectedKeys)
     {
         Dictionary<string, object> parameters = keys.Zip(values).ToDictionary(e => e.First, e => e.Second);
@@ -162,6 +160,7 @@ public class DatabaseTests
     [TestCase("SELECT id, name FROM category", new string[0], new object[0]  ,new string[] { "id", "name"})]
     [TestCase("SELECT id, price, title FROM item WHERE fk_category_id = @id", new string[] { "id" }, new object[] { 1 }, new string[] { "id", "price", "title"})]
     [TestCase("SELECT text, date_created FROM comment", new string[0], new object[0], new string[] { "text", "date_created" })]
+    [TestCase($"SELECT id, is_blocked FROM account WHERE id = @id AND is_blocked = @blocked", new string[] { "id", "blocked" }, new object[] { 1, 0 }, new string[] { "id", "is_blocked" })]
     public void Disconnected_Conn_Reconnects_And_Select_To_Dictionary(string query, string[] keys, object[] values, string[] expectedKeys)
     {
         FieldInfo connectionField = typeof(DbConnection).GetField("conn", BindingFlags.NonPublic | BindingFlags.Static);
