@@ -12,10 +12,9 @@ namespace tests;
 
 public class DatabaseTests
 {
-    private DbConnection dbConnection;
-    private Dictionary<string, List<long>> insertedEntries;
-
-    [SetUp]
+    private DbConnection dbConnection = TestsSetup.Db;
+    
+    /*[SetUp]
     public void Setup()
     {
         dbConnection = new DbConnection(new TestConfiguration());
@@ -31,13 +30,8 @@ public class DatabaseTests
         }
         
         insertedEntries = new();
-    }
-    private void TrackInsertedEntries(string table, long identifier)
-    {
-        insertedEntries.TryAdd(table, new List<long>());
-        insertedEntries[table].Add(identifier);
-    }
-
+    }*/
+    
     [Test]
     public void Bad_Sql_Returns_False_With_Exception()
     {
@@ -59,11 +53,8 @@ public class DatabaseTests
     [Test]
     public void Inserted_Entries_Return_Last_Inserted_Ids()
     {
-        if (dbConnection.LastInsertedId != 0)
-        {
-            throw new InvalidOperationException("Unable to test with non zero last inserted id");
-        }
-
+        long lastInserted = dbConnection.LastInsertedId;
+        
         if(!dbConnection.Execute(
                @"INSERT INTO category (name, description) VALUES (""test name"", ""test description"")", new()))
         {
@@ -71,7 +62,7 @@ public class DatabaseTests
         }
         
         long firstId = dbConnection.LastInsertedId;
-        TrackInsertedEntries("category", firstId);
+        TestsSetup.TrackInsertedEntries("category", firstId);
 
         if (!dbConnection.Execute(
                 @"INSERT INTO category (name, description) VALUES (""test name"", ""test description"")", new()))
@@ -80,10 +71,10 @@ public class DatabaseTests
         }
 
         long secondId = dbConnection.LastInsertedId;
-        TrackInsertedEntries("category", secondId);
+        TestsSetup.TrackInsertedEntries("category", secondId);
 
-        Assert.AreNotEqual(firstId, 0);
-        Assert.AreNotEqual(secondId, 0);
+        Assert.AreNotEqual(firstId, lastInserted);
+        Assert.AreNotEqual(secondId, lastInserted);
         Assert.AreEqual(secondId - firstId, 1);
     }
 

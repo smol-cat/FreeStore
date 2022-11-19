@@ -13,10 +13,10 @@ public class TestConfiguration : IConfiguration
     {
         configuration = new JObject()
         {
-            ["DB:host"] = "localhost",
-            ["DB:database"] = "free_store",
-            ["DB:username"] = "smol_cat",
-            ["DB:password"] = "2448",
+            ["DB:host"] = Globals.Host,
+            ["DB:database"] = Globals.Database,
+            ["DB:username"] = Globals.Username,
+            ["DB:password"] = Globals.Password,
         };
     }
 
