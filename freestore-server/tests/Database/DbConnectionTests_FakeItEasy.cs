@@ -1,4 +1,5 @@
-﻿using FakeItEasy;
+﻿/*
+using FakeItEasy;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
@@ -79,3 +80,4 @@ namespace tests.Database
         }
     }
 }
+*/

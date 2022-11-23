@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿/*
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
 using server.Database;
@@ -64,3 +65,4 @@ namespace tests.Database
         }
     }
 }
+*/

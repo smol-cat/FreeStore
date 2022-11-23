@@ -17,7 +17,7 @@ public class TestsSetup
     [OneTimeSetUp]
     public void Setup()
     {
-        Db = new DbConnection(new TestConfiguration());
+        Db = new DbConnection(new StubIConfiguration());
         Client = new RestClient(Globals.ApiRoot);
         InsertedEntries = new();
     }

@@ -1,4 +1,5 @@
-﻿using AutoMoq;
+﻿/*
+using AutoMoq;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
@@ -69,3 +70,4 @@ namespace tests.Database
         }
     }
 }
+*/

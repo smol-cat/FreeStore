@@ -5,11 +5,11 @@ using Newtonsoft.Json.Linq;
 
 namespace tests.utils;
 
-public class TestConfiguration : IConfiguration
+public class StubIConfiguration : IConfiguration
 {
     private JObject configuration;
     
-    public TestConfiguration()
+    public StubIConfiguration()
     {
         configuration = new JObject()
         {

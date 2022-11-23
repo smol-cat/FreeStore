@@ -1,7 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using server.Database;
+using server.Models.Account;
+using tests.utils;
 
 namespace tests.Database
 {
@@ -27,8 +31,8 @@ namespace tests.Database
         {
             // Arrange
             var dbConnection = this.CreateDbConnection();
-            string query = null;
-            Dictionary parameters = null;
+            string query = "SELECT * FROM category";
+            Dictionary<string, object> parameters = new();
 
             // Act
             var result = dbConnection.Execute(
@@ -36,7 +40,7 @@ namespace tests.Database
                 parameters);
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result);
         }
 
         [Test]
@@ -44,18 +48,19 @@ namespace tests.Database
         {
             // Arrange
             var dbConnection = this.CreateDbConnection();
-            string query = null;
-            Dictionary parameters = null;
-            List result = null;
+            string query = "SELECT * FROM account WHERE id = @id AND is_blocked = 0";
+            Dictionary<string, object> parameters = new() { ["id"] = 1 };
+            List<AccountModel> results = null;
 
             // Act
-            var result = dbConnection.SelectAndDeserialize(
+            var result = dbConnection.SelectAndDeserialize<AccountModel>(
                 query,
                 parameters,
-                out result);
+                out results);
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result);
+            Assert.IsNotEmpty(results);
         }
 
         [Test]
@@ -63,18 +68,21 @@ namespace tests.Database
         {
             // Arrange
             var dbConnection = this.CreateDbConnection();
-            string query = null;
-            Dictionary parameters = null;
-            List result = null;
+            string query = "SELECT id, name, last_name FROM account WHERE id = @id AND is_blocked = 0";
+            Dictionary<string, object> parameters = new() { ["id"] = 1 };
+            List<Dictionary<string, object>> results = null;
 
             // Act
             var result = dbConnection.SelectAndDeserialize(
                 query,
                 parameters,
-                out result);
+                out results);
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result);
+            Assert.IsTrue(results.First().ContainsKey("id"));
+            Assert.IsTrue(results.First().ContainsKey("name"));
+            Assert.IsTrue(results.First().ContainsKey("last_name"));
         }
     }
 }

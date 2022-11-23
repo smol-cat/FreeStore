@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿/*
+using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
 using System;
@@ -79,3 +80,4 @@ namespace tests.Database
         }
     }
 }
+*/
