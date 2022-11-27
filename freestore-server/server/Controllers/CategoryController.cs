@@ -10,7 +10,6 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("api/v1/categories")]
-[Authorize(Roles = Role.Everyone)]
 public class CategoryController : MainController
 {
     public CategoryController(DbConnection db) : base(db)

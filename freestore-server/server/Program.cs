@@ -25,6 +25,13 @@ builder.Services.AddDbContext<DbConnection>();
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<TokenCache>();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    });
+});
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication(options =>
@@ -51,6 +58,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<TokenManagerMiddleware>();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
