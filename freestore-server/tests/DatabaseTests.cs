@@ -13,24 +13,7 @@ namespace tests;
 public class DatabaseTests
 {
     private DbConnection dbConnection = TestsSetup.Db;
-    
-    /*[SetUp]
-    public void Setup()
-    {
-        dbConnection = new DbConnection(new TestConfiguration());
-        insertedEntries = new();
-    }
 
-    [TearDown]
-    public void TearDown()
-    {
-        foreach (var entry in insertedEntries)
-        {
-            entry.Value.ForEach(id => dbConnection.Execute($"DELETE FROM {entry.Key} WHERE id = @id", new () { ["id"] = (int)id }));
-        }
-        
-        insertedEntries = new();
-    }*/
     
     [Test]
     public void Bad_Sql_Returns_False_With_Exception()

@@ -39,6 +39,18 @@ public class CategoryController : MainController
         return Ok(categories);
     }
 
+    [HttpGet]
+    [Route("{id}")]
+    public IActionResult Get(int id)
+    {
+        if (!TryGetCategory(id, out IdCategoryModel categoryModel))
+        {
+            return DatabaseError("Error occured trying to fetch category");
+        }
+
+        return Ok(categoryModel);
+    }
+
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
     public IActionResult Add(CategoryModel categoryModel)

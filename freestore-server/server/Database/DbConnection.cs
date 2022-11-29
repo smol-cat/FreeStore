@@ -113,19 +113,22 @@ public class DbConnection : DbContext
         result = new();
         MySqlCustomReader customReader = null;
 
-        try
+        lock (conn)
         {
-            result = SelectAndDeserializeLogic(query, parameters, customReader);
-        }
-        catch (Exception e)
-        {
-            if (!HandleException(e))
+            try
             {
-                return false;
+                result = SelectAndDeserializeLogic(query, parameters, customReader);
             }
+            catch (Exception e)
+            {
+                if (!HandleException(e))
+                {
+                    return false;
+                }
 
-            customReader?.Reader.Close();
-            result = SelectAndDeserializeLogic(query, parameters, customReader);
+                customReader?.Reader.Close();
+                result = SelectAndDeserializeLogic(query, parameters, customReader);
+            }
         }
 
         return true;
@@ -152,20 +155,25 @@ public class DbConnection : DbContext
     {
         MySqlCustomReader customReader = null;
         result = new();
-        try
-        {
-            result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
-        }
-        catch(Exception e)
-        {
-            if (!HandleException(e))
-            {
-                return false;
-            }
 
-            customReader?.Reader.Close();
-            result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
+        lock (conn)
+        {
+            try
+            {
+                result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
+            }
+            catch (Exception e)
+            {
+                if (!HandleException(e))
+                {
+                    return false;
+                }
+
+                customReader?.Reader.Close();
+                result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
+            }
         }
+
         return true;
     }
 }
