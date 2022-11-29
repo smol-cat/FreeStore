@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="onSubmit">
+    <form class="loginForm" @submit.prevent="onSubmit">
         <a class="errorMessage"></a>
         <a class="successMessage"></a>
         <labeledInput :id="'name'" :_placeholder="'Vardas'" :_required="true" :_type="'text'" />
@@ -7,7 +7,7 @@
         <labeledInput :id="'email'" :_placeholder="'El. paštas'" :_required="true" :_type="'text'" />
         <labeledInput :id="'password'" :_placeholder="'Slaptažodis'" :_required="true" :_type="'password'" />
         <labeledInput :id="'passwordRepeat'" :_placeholder="'Pakartoti slaptažodį'" :_required="true" :_type="'password'" />
-        <credentialsSubmitButton :text="'Registruotis'" />
+        <submitButton :text="'Registruotis'" />
         <hRef :label="'Turite paskyrą? Prisijunkite'" :link="'/login'" />
     </form>
 </template>
@@ -15,13 +15,13 @@
 
 <script>
 import labeledInput from '@/components/input/labeledInput.vue';
-import credentialsSubmitButton from '@/components/input/credentialsSubmitButton.vue';
+import submitButton from '@/components/input/submitButton.vue';
 import hRef from '@/components/navigation/hRef.vue';
 
 export default {
     components: {
         labeledInput,
-        credentialsSubmitButton,
+        submitButton,
         hRef
     },
     methods: {

@@ -1,12 +1,12 @@
 <template>
-    <div class="profile">
+    <div v-if="this.loaded" class="profile">
         <table>
             <tr>
                 <th>
                     <p>Vardas</p>
                 </th>
                 <td>
-                    <p>{{ this.userData.name }}</p>
+                    <p>{{ this.userData.name + " " + this.userData.last_name }}</p>
                 </td>
             </tr>
             <tr>
@@ -56,6 +56,11 @@ export default {
                 this.userData = response.body
                 this.loaded = true
             }
+        }
+    },
+    methods: {
+        onSubmit(){
+            
         }
     }
 }

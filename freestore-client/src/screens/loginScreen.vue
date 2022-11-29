@@ -1,25 +1,25 @@
 <template>
-    <form @submit.prevent="onSubmit">
+    <form class="loginForm" @submit.prevent="onSubmit">
         <a class="errorMessage"></a>
         <fieldset>
             <labeledInput id="email" type="text" placeholder="El.paštas" required="true" />
             <labeledInput id="password" type="password" placeholder="Slaptažodis" required="true" />
         </fieldset>
-        <credentialsSubmitButton text="Prisijungti" />
+        <submitButton text="Prisijungti" />
         <hRef :label="'Neturite paskyros? Registruokitės'" :link="'/register'" />
     </form>
 </template>
 
 <script>
 import labeledInput from '../components/input/labeledInput.vue'
-import credentialsSubmitButton from '../components/input/credentialsSubmitButton.vue'
+import submitButton from '../components/input/submitButton.vue'
 import hRef from '@/components/navigation/hRef.vue';
 
 export default {
     name: 'loginScreen',
     components: {
         labeledInput, 
-        credentialsSubmitButton,
+        submitButton,
         hRef
     },  
     methods: {
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style>
-form {
+.loginForm {
     margin-top: 30px;
     margin-left: auto;
     margin-right: auto;

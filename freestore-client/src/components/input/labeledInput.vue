@@ -1,5 +1,5 @@
 <template>
-  <input :id="_id" :type="_type" :placeholder="_placeholder" :required="_required" />
+  <input :id="_id" :type="_type" :placeholder="_placeholder" :required="_required" :value="_value" />
 </template>
 
 <script>
@@ -10,7 +10,8 @@ export default {
     _id: String,
     _placeholder: String,
     _type: String,
-    _required: Boolean
+    _required: Boolean,
+    _value : String,
   }
 }
 </script>

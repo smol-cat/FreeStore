@@ -4,7 +4,6 @@
 
 <script>
 export default {
-  name: 'credentialsSubmitButton',
   props: {
     text: String
   }

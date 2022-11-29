@@ -1,10 +1,10 @@
 <template>
     <ul class="menuBar">
-        <li v-for="(link, name) in getElements()" :key="name" class="menuBar_item" :class="{ activeLink: link === pathname }">
-            <a :href="link === pathName ? '#' : link">{{ name }}</a>
+        <li v-for="(link, name) in getElements()" :key="name" class="menuBar_item" :class="{ activeLink: link === this.getPath() }">
+            <a :href="link === this.getPath() ? '#' : link">{{ name }}</a>
         </li>
-        <li v-if="headerInfo.authenticated" class="menuBar_item" :class="{ activeLink: '/profile' === pathname }">
-            <a :href="'/profile' === pathname ? '#' : '/profile'">Profilis</a>
+        <li v-if="headerInfo.authenticated" class="menuBar_item" :class="{ activeLink: '/profile' === this.getPath() }">
+            <a :href="'/profile' === this.getPath() ? '#' : '/profile'">Profilis</a>
         </li>
         <li class="menuBar_item">
             <categories-drop-down-menu/>
@@ -19,7 +19,6 @@ export default {
   components: { categoriesDropDownMenu },
     data() {
         return {
-            pathname: window.location.pathname,
             elements: [{
                 "Namai": "/"
             }]
@@ -34,6 +33,9 @@ export default {
         }
     },
     methods: {
+        getPath(){
+            return window.location.pathname
+        },
         getElements() {
             return this.elements
         }

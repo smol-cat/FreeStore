@@ -11,15 +11,23 @@ import mainHeader from './misc/mainHeader.vue'
 import profileScreen from './screens/profileScreen.vue'
 import registerScreen from './screens/registerScreen.vue'
 import profileEditScreen from './screens/profileEditScreen.vue'
+import postFeedScreen from './screens/postFeedScreen.vue'
 
 const routes = {
-  '': homeScreen,
+  '/': homeScreen,
   'login': loginScreen,
   'profile': {
-    '': profileScreen,
+    '/': profileScreen,
     'edit': profileEditScreen
   },
   'register': registerScreen,
+  'categories': {
+    '*':{
+      '/': notFoundScreen,
+      'items': postFeedScreen,
+      'edit': notFoundScreen
+    }
+  }
 }
 
 export default {
@@ -37,16 +45,20 @@ export default {
   },
   computed: {
     currentView() {
-      var entries = this.currentPath.split("/")
-      if(!entries[0]){
-        entries.shift()
+      var endpoints = this.currentPath.split("/")
+      endpoints.shift()
+      if(endpoints[endpoints.lastIndexOf()] === ""){
+        endpoints.pop()
       }
-      var currRouteElem = routes[this.currentPath]
-      while(currRouteElem instanceof Object){
-        console.log(currRouteElem)
+      var currEntry = endpoints.shift() || undefined
+      var currRouteElem = routes
+      while (currEntry != undefined && currRouteElem != undefined) {
+        currRouteElem = currRouteElem[currEntry] || currRouteElem['*']
+        currEntry = endpoints.shift()
+      }
 
-      }
-      return routes[this.currentPath] || notFoundScreen
+      return currEntry === undefined && (currRouteElem?.__file ?? false) ?
+        currRouteElem : (currRouteElem?.['/'] || notFoundScreen)
     },
 
     header() {
@@ -117,5 +129,9 @@ body {
 .refButton:hover {
   background-color: #57a1a1;
   color: white;
+}
+
+h2{
+  color: rgb(42, 70, 68)
 }
 </style>
