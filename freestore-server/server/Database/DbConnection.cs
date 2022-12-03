@@ -60,12 +60,16 @@ public class DbConnection : DbContext
 
     private void ExecuteLogic(string query, Dictionary<string, object> parameters)
     {
-        using var cmd = new MySqlCommand();
-        parameters.ToList().ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-        cmd.Connection = conn;
-        cmd.CommandText = query;
-        cmd.ExecuteNonQuery();
-        LastInsertedId = cmd.LastInsertedId;
+        lock (conn)
+        {
+            using var cmd = new MySqlCommand();
+            parameters.ToList()
+                .ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+            cmd.Connection = conn;
+            cmd.CommandText = query;
+            cmd.ExecuteNonQuery();
+            LastInsertedId = cmd.LastInsertedId;
+        }
     }
 
     public bool Execute(string query, Dictionary<string, object> parameters)

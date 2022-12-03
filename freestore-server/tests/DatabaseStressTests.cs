@@ -18,13 +18,15 @@ public class DatabaseStressTests
     private CredentialsModel credentials = new CredentialsModel(
         "", "", "ernunt@gmail.com", "123456789");
     string authorizationToken;
+    
+    private static Random rng = new Random();  
 
     public List<string> endpoints = new(){
-        "/accounts/1",
-        "/accounts/1",
-        "/accounts/1",
-        "/accounts/1",
-        "/accounts/1",
+        "/accounts/4",
+        "/accounts/4",
+        "/accounts/4",
+        "/accounts/4",
+        "/accounts/4",
         "/categories",
         "/categories/1/items",
         "/categories/1/items",
@@ -43,11 +45,25 @@ public class DatabaseStressTests
         "/accounts/own",
         "/accounts/own",
         "/accounts/own",
-        "/accounts/1",
-        "/accounts/1",
-        "/accounts/1",
-        "/accounts/1",
-        "/accounts/1",
+        "/accounts/4",
+        "/accounts/4",
+        "/accounts/4",
+        "/accounts/4",
+        "/accounts/4",
+    };
+
+    public List<string> postEndpoints = new()
+    {
+        "/tokens",
+        "/tokens",
+        "/tokens",
+        "/tokens",
+        "/tokens",
+        "/tokens",
+        "/tokens",
+        "/tokens",
+        "/tokens",
+        "/tokens",
     };
 
     [Test]
@@ -64,10 +80,12 @@ public class DatabaseStressTests
 
         var responses = new ConcurrentBag<RestResponse>();
 
-        Parallel.ForEach(endpoints, e =>
+        List<RestRequest> requests = endpoints.Select(e => new RestRequest(e)).ToList();
+        requests.AddRange(postEndpoints.Select(e => new RestRequest(e, Method.Post).AddJsonBody(credentials)).ToList());
+
+        Parallel.ForEach(requests, request =>
         {
             var localClient = new RestClient(tests.Globals.ApiRoot);
-            request = new(e);
             TryPerformRequest(request, out var response, localClient);
             responses.Add(response);
         });
@@ -75,6 +93,16 @@ public class DatabaseStressTests
         responses.ToList().ForEach(e => {
             Console.WriteLine(e.StatusCode);
         });
+    }
+    
+    private void Shuffle<T>(IList<T> list)  
+    {  
+        int n = list.Count;  
+        while (n > 1) {  
+            n--;  
+            int k = rng.Next(n + 1);  
+            (list[k], list[n]) = (list[n], list[k]);
+        }  
     }
 
     private bool TryPerformRequest(RestRequest request, out RestResponse response, RestClient? customClient = null)

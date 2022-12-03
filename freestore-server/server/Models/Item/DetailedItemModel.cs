@@ -16,6 +16,7 @@ public class DetailedItemModel : IDeserializable
     public IdCategoryModel Category { get; set; }
     public AccountModel Account { get; set; }
     public StateModel State { get; set; }
+    public long? CommentCount { get; set; }
 
     public void Deserialize(MySqlCustomReader reader)
     {
@@ -24,6 +25,8 @@ public class DetailedItemModel : IDeserializable
         Price = (decimal)reader["price"];
         Description = (string)reader["description"];
         Image_ids = ((string?)reader["image_ids"])?.Split(",").Select(e => int.Parse(e)).ToList() ?? new();
+        CommentCount = (long?)reader["comment_count"];
+
         Category = new IdCategoryModel
         {
             Id = (int)reader["category_id"],

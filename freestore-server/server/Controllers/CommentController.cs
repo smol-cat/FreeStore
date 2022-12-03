@@ -51,7 +51,7 @@ public class CommentController : MainController
             return NotFound(new ResponseModel("Item or category was not found"));
         }
 
-        if (!Db.SelectAndDeserialize<DetailedCommentModel>("SELECT * FROM detailed_comment WHERE item_id = @item_id", new() { ["item_id"] = itId }, out var comments))
+        if (!Db.SelectAndDeserialize<DetailedCommentModel>("SELECT * FROM detailed_comment WHERE item_id = @item_id ORDER BY date_created DESC", new() { ["item_id"] = itId }, out var comments))
         {
             return DatabaseError("Could not get a list of comments");
         }
