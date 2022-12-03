@@ -45,8 +45,8 @@ export default {
         if (request.success) {
             this.categories = request.body
         }
-
-    }
+    },
+    screen: true
 }
 </script>
 

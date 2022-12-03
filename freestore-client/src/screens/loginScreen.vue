@@ -39,7 +39,8 @@ export default {
                 document.getElementsByClassName("errorMessage")[0].text = response.body?.message || "Įvyko klaida"
             }
         }
-    }
+    },
+    screen: true
 }
 </script>
 

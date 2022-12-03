@@ -79,7 +79,7 @@ export default {
         currEntry = endpoints.shift()
       }
 
-      return currEntry === undefined && (currRouteElem?.name ?? false) ?
+      return currEntry === undefined && ((currRouteElem?.screen ?? false) === true ) ?
         currRouteElem : (currRouteElem?.['/'] || notFoundScreen)
     },
 

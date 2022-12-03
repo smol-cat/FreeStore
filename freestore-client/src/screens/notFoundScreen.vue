@@ -7,5 +7,6 @@
 export default({
     name: 'notFoundScreen',
     emits: [ 'triggerModal' ],
+    screen: true
 })
 </script>

@@ -42,7 +42,8 @@ export default {
                 this.items = response.body
             }
         }
-    }
+    },
+    screen: true
 }
 </script>
 

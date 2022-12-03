@@ -58,7 +58,8 @@ export default {
                 }
             })
         }
-    }
+    },
+    screen: true
 }
 </script>
 

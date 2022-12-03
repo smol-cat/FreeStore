@@ -86,7 +86,8 @@ export default {
                 location.pathname = `/categories/${endpoints[2]}/items`
             }
         }
-    }
+    },
+    screen: true
 }
 </script>
 

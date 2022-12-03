@@ -37,8 +37,6 @@ myApp.config.globalProperties.performRequest = async (uri, method, body) => {
         }
     }
 
-    console.log(response)
-
     return {
         success: response.status >= 200 && response.status < 400,
         statusCode: response.status,

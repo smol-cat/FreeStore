@@ -6,6 +6,7 @@
 export default {
     name: 'homeScreen',
     emits: [ 'triggerModal' ],
+    screen: true
 }
 </script>
 

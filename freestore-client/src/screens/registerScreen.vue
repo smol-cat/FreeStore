@@ -52,7 +52,8 @@ export default {
                 errorMessageField.text = response.body?.message || "Įvyko klaida"
             }
         }
-    }
+    },
+    screen: true
 }
 </script>
 

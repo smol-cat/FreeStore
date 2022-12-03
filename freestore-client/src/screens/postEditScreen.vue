@@ -117,7 +117,8 @@ export default {
                 errorMessage.text = response.body?.message || "Įvyko klaida"
             }
         }
-    }
+    },
+    screen: true
 }
 </script>
 
