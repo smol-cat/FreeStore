@@ -24,8 +24,8 @@ export default {
             ]
         }
     },
-    beforeMount(){
-        if(this.chosenStatus){
+    beforeMount() {
+        if (this.chosenStatus) {
             this.chosen = this.chosenStatus
         }
     },
@@ -48,4 +48,5 @@ export default {
 </script>
 
 <style>
+
 </style>

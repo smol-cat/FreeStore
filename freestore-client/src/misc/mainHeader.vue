@@ -37,9 +37,14 @@ div .side {
     text-align: right;
 }
 
-@include media-breakpoint-down(md) {
+@media (max-width: 768px) {
     div .side {
-        margin: 20px;
+        padding-top: 40px;
+        float: none;
+        text-align: center;
+    }
+
+    .mainTitle h1 {
         text-align: center;
     }
 }
@@ -48,7 +53,6 @@ div .side {
     color: rgb(200, 255, 255);
     text-align: left;
     margin: 10px;
-    /* padding: 10px; */
     font-size: 25px;
     font-family: Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
