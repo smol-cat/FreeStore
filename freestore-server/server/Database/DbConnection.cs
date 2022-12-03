@@ -9,6 +9,9 @@ namespace server.Database;
 public class DbConnection : DbContext
 {
     private static MySqlConnection conn;
+
+    private static readonly object lockObject = new object();
+
     private static string _connectionString;
     public Exception LastException { get; private set; }
 
@@ -60,38 +63,39 @@ public class DbConnection : DbContext
 
     private void ExecuteLogic(string query, Dictionary<string, object> parameters)
     {
-        lock (conn)
-        {
-            using var cmd = new MySqlCommand();
-            parameters.ToList()
-                .ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
-            cmd.Connection = conn;
-            cmd.CommandText = query;
-            cmd.ExecuteNonQuery();
-            LastInsertedId = cmd.LastInsertedId;
-        }
+        using var cmd = new MySqlCommand();
+        parameters.ToList()
+            .ForEach(e => cmd.Parameters.Add($"@{e.Key}", TypeMap[e.Value.GetType()]).Value = e.Value);
+        cmd.Connection = conn;
+        cmd.CommandText = query;
+        cmd.ExecuteNonQuery();
+        LastInsertedId = cmd.LastInsertedId;
+
     }
 
     public bool Execute(string query, Dictionary<string, object> parameters)
     {
-        try
+        lock (lockObject)
         {
-            ExecuteLogic(query, parameters);
-        }
-        catch (Exception e)
-        {
-            if (!HandleException(e))
+            try
             {
-                return false;
+                ExecuteLogic(query, parameters);
+            }
+            catch (Exception e)
+            {
+                if (!HandleException(e))
+                {
+                    return false;
+                }
+
+                ExecuteLogic(query, parameters);
             }
 
-            ExecuteLogic(query, parameters);
+            return true;
         }
-
-        return true;
     }
 
-    private List<Dictionary<string, object>> SelectAndDeserializeLogic(string query, Dictionary<string, object> parameters, MySqlCustomReader customReader)
+    private List<Dictionary<string, object>> SelectAndDeserializeLogic(string query, Dictionary<string, object> parameters, out MySqlCustomReader customReader)
     {
         List<Dictionary<string, object>> result = new();
         MySqlCommand cmd = new MySqlCommand();
@@ -114,31 +118,34 @@ public class DbConnection : DbContext
 
     public bool SelectAndDeserialize(string query, Dictionary<string, object> parameters, out List<Dictionary<string, object>> result)
     {
-        result = new();
-        MySqlCustomReader customReader = null;
-
-        lock (conn)
+        lock (lockObject)
         {
+            result = new();
+            MySqlCustomReader customReader = null;
+
             try
             {
-                result = SelectAndDeserializeLogic(query, parameters, customReader);
+                result = SelectAndDeserializeLogic(query, parameters, out customReader);
             }
             catch (Exception e)
             {
+                customReader?.Reader.Close();
                 if (!HandleException(e))
                 {
                     return false;
                 }
 
-                customReader?.Reader.Close();
-                result = SelectAndDeserializeLogic(query, parameters, customReader);
+                result = SelectAndDeserializeLogic(query, parameters, out customReader);
             }
+            finally
+            {
+                customReader?.Reader.Close();
+            }
+            return true;
         }
-
-        return true;
     }
 
-    private List<T> SelectAndDeserializeLogic<T>(string query, Dictionary<string, object> parameters, MySqlCustomReader customReader) where T : IDeserializable, new()
+    private List<T> SelectAndDeserializeLogic<T>(string query, Dictionary<string, object> parameters, out MySqlCustomReader customReader) where T : IDeserializable, new()
     {
         List<T> result = new();
         MySqlCommand cmd = new MySqlCommand();
@@ -157,27 +164,30 @@ public class DbConnection : DbContext
 
     public bool SelectAndDeserialize<T>(string query, Dictionary<string, object> parameters, out List<T> result) where T : IDeserializable, new()
     {
-        MySqlCustomReader customReader = null;
-        result = new();
-
-        lock (conn)
+        lock (lockObject)
         {
+            MySqlCustomReader customReader = null;
+            result = new();
+
             try
             {
-                result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
+                result = SelectAndDeserializeLogic<T>(query, parameters, out customReader);
             }
             catch (Exception e)
             {
+                customReader?.Reader?.Close();
                 if (!HandleException(e))
                 {
                     return false;
                 }
 
-                customReader?.Reader.Close();
-                result = SelectAndDeserializeLogic<T>(query, parameters, customReader);
+                result = SelectAndDeserializeLogic<T>(query, parameters, out customReader);
             }
-        }
+            finally{
+                customReader?.Reader.Close();
+            }
 
-        return true;
+            return true;
+        }
     }
 }

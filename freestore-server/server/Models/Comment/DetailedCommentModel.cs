@@ -14,14 +14,16 @@ public class DetailedCommentModel : IDeserializable
     public void Deserialize(MySqlCustomReader reader)
     {
         Id = (int)reader["id"];
-        Text = (string)reader["Text"];
+        Text = (string)reader["text"];
         Date_created = (DateTime)reader["date_created"];
-        Account = new AccountModel
+
+        if (reader["name"] != null)
         {
-            Id = (int)reader["account_id"],
-            Name = (string)reader["name"],
-            Last_name = (string)reader["last_name"],
-            Level = (int)reader["account_level"]
-        };
+            Account = new AccountModel();
+            Account.Id = (int)reader["account_id"];
+            Account.Name = (string)reader["name"];
+            Account.Last_name = (string)reader["last_name"];
+            Account.Level = (int)reader["account_level"];
+        }
     }
 }

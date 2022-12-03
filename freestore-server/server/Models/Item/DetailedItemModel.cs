@@ -33,13 +33,16 @@ public class DetailedItemModel : IDeserializable
             Name = (string)reader["category_name"],
         };
 
-        Account = new AccountModel
+        if (reader["account_name"] != null)
         {
-            Id = (int)reader["account_id"],
-            Name = (string)reader["account_name"],
-            Last_name = (string)reader["account_last_name"],
-            Level = (int?)reader["account_level"]
-        };
+            Account = new AccountModel
+            {
+                Id = (int)reader["account_id"],
+                Name = (string)reader["account_name"],
+                Last_name = (string)reader["account_last_name"],
+                Level = (int?)reader["account_level"]
+            };
+        }
 
         State = new StateModel
         {
