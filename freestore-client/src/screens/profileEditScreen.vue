@@ -76,7 +76,7 @@ export default {
                 successMessage.text = 'Profilis atnaujintas'
             }
             else {
-                errorMessage.text = response.body.message || "Įvyko klaida"
+                errorMessage.text = response.body?.message || "Įvyko klaida"
             }
         }
     }

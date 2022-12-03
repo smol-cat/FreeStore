@@ -1,16 +1,14 @@
 <template>
-    <a v-if="!headerInfo.authenticated" href="/login">Prisijungti</a>
-    <p v-if="headerInfo.authenticated">Prisijungėte kaip: <b>{{ this.headerInfo.userData.name + " " +
-            this.headerInfo.userData.last_name
-    }}</b></p>
-    <a v-if="headerInfo.authenticated" v-on:click="logout()" href="#">Atsijungti</a>
+    <a v-if="!userName" href="/login">Prisijungti</a>
+    <p v-if="userName">Prisijungėte kaip: <b>{{ this.userName }}</b></p>
+    <a v-if="userName" v-on:click="logout()" href="#">Atsijungti</a>
 </template>
 
 <script>
 
 export default {
     props: {
-        headerInfo: Object
+        userName: String
     },
     name: "loginHRef",
     methods: {

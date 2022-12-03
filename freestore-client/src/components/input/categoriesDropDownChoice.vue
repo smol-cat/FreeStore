@@ -1,10 +1,10 @@
 <template>
-    <a v-on:click="toggleMenu()">{{ text || "Prekės" }}</a>
+    <a v-on:click="toggleMenu()" :class="{chosenCategory: chosen}">{{ chosen || text }}</a>
     <div class="menu">
         <div v-show="this.opened" class="menu__list" :class="{ 'menu__list--animate': this.opened }">
             <ul>
                 <li v-for="category in this.categories" :key="category.id" :class="'menu__list__item'">
-                    <a :href="'/categories/' + category.id + '/items'">{{ category.name }}</a>
+                    <a v-on:click="choose(category)">{{ category.name }}</a>
                 </li>
             </ul>
         </div>
@@ -16,12 +16,14 @@ export default {
     data() {
         return {
             opened: false,
+            chosen: null,
             categories: []
         }
     },
     props: {
         text: String
     },
+    emits: ['chooseCategory'],
     methods: {
         async toggleMenu() {
             if (this.categories.length === 0) {
@@ -32,6 +34,11 @@ export default {
             }
             this.opened = !this.opened
         },
+        choose(category) {
+            this.chosen = category.name
+            this.$emit('chooseCategory', category)
+            this.toggleMenu()
+        }
     }
 } 
 </script>
@@ -76,6 +83,10 @@ export default {
     position: block;
     text-decoration: none;
     text-align: center;
+}
+
+.chosenCategory{
+    font-weight: bold;
 }
 
 @keyframes opacityAnimation {

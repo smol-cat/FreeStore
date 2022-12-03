@@ -8,32 +8,42 @@ myApp.config.globalProperties.performRequest = async (uri, method, body) => {
         'Content-Type': 'application/json'
     }
 
-    if(localStorage.getItem("token")){
-        headers["Authorization"] = "Bearer " + localStorage.getItem("token") 
+    if (localStorage.getItem("token")) {
+        headers["Authorization"] = "Bearer " + localStorage.getItem("token")
     }
 
-    const response = await fetch(myApp.config.globalProperties.apiRoot + uri, {
-        method: method,
-        mode: 'cors',
-        cache: 'no-cache',
-        headers: headers,
-        redirect: 'follow',
-        body: JSON.stringify(body)
-    })
+    try {
+        var response = await fetch(myApp.config.globalProperties.apiRoot + uri, {
+            method: method,
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: headers,
+            redirect: 'follow',
+            body: JSON.stringify(body)
+        })
 
-    var jsonBody
+        var jsonBody
 
-    try{
-        jsonBody = await response.json()
+        try {
+            jsonBody = await response.json()
+        }
+        catch {
+            jsonBody = {}
+        }
     }
-    catch{
-        jsonBody = {}
+    catch(e){
+        return {
+            success: false
+        }
     }
+
+    console.log(response)
 
     return {
         success: response.status >= 200 && response.status < 400,
         statusCode: response.status,
-        body: jsonBody
+        body: jsonBody,
+        headers: response.headers
     }
 }
 

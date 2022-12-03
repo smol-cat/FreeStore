@@ -35,7 +35,7 @@ export default {
                 location.pathname = ""
             }
             else{
-                document.getElementsByClassName("errorMessage")[0].text = response.body.message || "Įvyko klaida"
+                document.getElementsByClassName("errorMessage")[0].text = response.body?.message || "Įvyko klaida"
             }
         }
     }

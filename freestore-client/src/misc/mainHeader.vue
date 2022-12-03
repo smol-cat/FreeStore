@@ -1,13 +1,13 @@
 <template>
     <div class="header">
         <div class="side">
-            <loginHRef :headerInfo="this.headerInfo" />
+            <loginHRef :userName="this.userName" />
         </div>
         <div class="mainTitle">
             <h1>FreeStore</h1>
         </div>
         <div class="navBarArea">
-            <mainNavBar :headerInfo="this.headerInfo" />
+            <mainNavBar :authenticated="this.authenticated" :level="this.level" />
         </div>
     </div>
 </template>
@@ -19,7 +19,9 @@ import loginHRef from '@/components/navigation/loginHRef.vue';
 export default {
     name: "mainHeader",
     props: {
-        headerInfo: Object
+        authenticated: Boolean,
+        userName: String,
+        level: Number,
     },
     components: {
         mainNavBar,

@@ -1,6 +1,7 @@
 <template>
-  <mainHeader :headerInfo="userStatus" />
-  <component :is="currentView" />
+  <modal-screen v-if="modalData" :message="modalData.message" :onConfirm="modalData.onConfirm" @closeModal="modalData = null"/>
+  <mainHeader :authenticated="userStatus.authenticated" :userName="(userStatus.userData ? (userStatus.userData.name + ' ' + userStatus.userData.last_name) : null)" :level="userStatus.userData?.level" />
+  <component :is="currentView" @triggerModal="(message, onConfirm) => modalData = { message: message, onConfirm: onConfirm }"/>
 </template>
 
 <script>
@@ -12,19 +13,30 @@ import profileScreen from './screens/profileScreen.vue'
 import registerScreen from './screens/registerScreen.vue'
 import profileEditScreen from './screens/profileEditScreen.vue'
 import postFeedScreen from './screens/postFeedScreen.vue'
+import postDetailsScreen from './screens/postDetailsScreen.vue'
+import postCreateScreen from './screens/postCreateScreen.vue'
+import usersScreen from './screens/usersScreen.vue'
+import modalScreen from './components/informational/modalScreen.vue'
 
 const routes = {
   '/': homeScreen,
+  'accounts': usersScreen,
   'login': loginScreen,
   'profile': {
     '/': profileScreen,
     'edit': profileEditScreen
   },
   'register': registerScreen,
+  'newItem': postCreateScreen,
   'categories': {
-    '*':{
+    '/': notFoundScreen,
+    'new': notFoundScreen,
+    '*': {
       '/': notFoundScreen,
-      'items': postFeedScreen,
+      'items': {
+        '/': postFeedScreen,
+        '*': postDetailsScreen,
+      },
       'edit': notFoundScreen
     }
   }
@@ -33,21 +45,24 @@ const routes = {
 export default {
   name: 'app',
   components: {
-    mainHeader
+    mainHeader,
+    modalScreen
   },
   data() {
     return {
+      modalData: null,
       currentPath: window.location.pathname,
       userStatus: {
         authenticated: false
       }
     }
   },
+  emits: ["triggerModal", "closeModal"],
   computed: {
     currentView() {
       var endpoints = this.currentPath.split("/")
       endpoints.shift()
-      if(endpoints[endpoints.lastIndexOf()] === ""){
+      if (endpoints[endpoints.length - 1] === "") {
         endpoints.pop()
       }
       var currEntry = endpoints.shift() || undefined
@@ -131,7 +146,7 @@ body {
   color: white;
 }
 
-h2{
+h2 {
   color: rgb(42, 70, 68)
 }
 </style>

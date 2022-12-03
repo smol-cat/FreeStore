@@ -1,5 +1,5 @@
 <template>
-  <input :id="_id" :type="_type" :placeholder="_placeholder" :required="_required" :value="_value" />
+  <input class="input" :id="_id" :type="_type" :placeholder="_placeholder" :required="_required" :value="_value" />
 </template>
 
 <script>
@@ -17,7 +17,7 @@ export default {
 </script>
 
 <style>
-  input{
+.input{
     width: 300px;
     margin: 5px;
     padding: 10px;

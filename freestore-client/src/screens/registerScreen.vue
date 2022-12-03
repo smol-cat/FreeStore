@@ -48,7 +48,7 @@ export default {
                 successMessageField.text = "Sėkmingai prisiregistravote, galite prisijungti"
             }
             else {
-                errorMessageField.text = response.body.message || "Įvyko klaida"
+                errorMessageField.text = response.body?.message || "Įvyko klaida"
             }
         }
     }
