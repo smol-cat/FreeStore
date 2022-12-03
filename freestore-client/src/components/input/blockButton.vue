@@ -1,10 +1,11 @@
 <template>
-    <input class="blockButton" type="button" :value="this.text" v-on:click="onClick()" />
+    <input class="blockButton" :type="isSubmit ? 'submit' : 'button'" :value="this.text" v-on:click="onClick()" />
 </template>
 
 <script>
 export default {
     props: {
+        isSubmit: Boolean,
         onClick: Function,
         text: String
     },

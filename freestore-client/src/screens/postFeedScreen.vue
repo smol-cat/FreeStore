@@ -23,6 +23,7 @@ export default {
         this.loadCategory(categoryId)
         this.loadItems(categoryId)
     },
+    emits: ['triggerModal'],
     methods: {
         async loadCategory(catId) {
             var response = await this.performRequest(`/categories/${catId}`)

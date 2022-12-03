@@ -21,17 +21,22 @@ export default {
         }
     },
     props: {
+        chosenCategory: String,
         text: String
+    },
+    async beforeMount() {
+        var response = await this.performRequest("/categories", "GET")
+        if (response.success) {
+            this.categories = response.body
+        }
+        
+        if (this.chosenCategory) {
+            this.chosen = this.chosenCategory
+        }
     },
     emits: ['chooseCategory'],
     methods: {
         async toggleMenu() {
-            if (this.categories.length === 0) {
-                var response = await this.performRequest("/categories", "GET")
-                if (response.success) {
-                    this.categories = response.body
-                }
-            }
             this.opened = !this.opened
         },
         choose(category) {
@@ -85,7 +90,7 @@ export default {
     text-align: center;
 }
 
-.chosenCategory{
+.chosenCategory {
     font-weight: bold;
 }
 

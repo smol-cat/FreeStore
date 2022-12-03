@@ -11,7 +11,7 @@ export default {
     _placeholder: String,
     _type: String,
     _required: Boolean,
-    _value : String,
+    _value: String,
   }
 }
 </script>

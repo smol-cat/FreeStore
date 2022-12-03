@@ -37,6 +37,13 @@ div .side {
     text-align: right;
 }
 
+@include media-breakpoint-down(md) {
+    div .side {
+        margin: 20px;
+        text-align: center;
+    }
+}
+
 .mainTitle {
     color: rgb(200, 255, 255);
     text-align: left;
@@ -54,7 +61,7 @@ div .header {
     max-width: 1200px;
 }
 
-.navBarArea{
+.navBarArea {
     width: inherit;
 }
 </style>

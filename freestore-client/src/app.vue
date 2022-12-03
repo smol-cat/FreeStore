@@ -17,6 +17,10 @@ import postDetailsScreen from './screens/postDetailsScreen.vue'
 import postCreateScreen from './screens/postCreateScreen.vue'
 import usersScreen from './screens/usersScreen.vue'
 import modalScreen from './components/informational/modalScreen.vue'
+import categoriesScreen from './screens/categoriesScreen.vue'
+import categoryEditScreen from './screens/categoryEditScreen.vue'
+import categoryCreateScreen from './screens/categoryCreateScreen.vue'
+import postEditScreen from './screens/postEditScreen.vue'
 
 const routes = {
   '/': homeScreen,
@@ -29,15 +33,18 @@ const routes = {
   'register': registerScreen,
   'newItem': postCreateScreen,
   'categories': {
-    '/': notFoundScreen,
-    'new': notFoundScreen,
+    '/': categoriesScreen,
+    'new': categoryCreateScreen,
     '*': {
       '/': notFoundScreen,
       'items': {
         '/': postFeedScreen,
-        '*': postDetailsScreen,
+        '*': {
+          '/': postDetailsScreen,
+          'edit': postEditScreen
+        },
       },
-      'edit': notFoundScreen
+      'edit': categoryEditScreen,
     }
   }
 }
@@ -81,7 +88,7 @@ export default {
     }
   },
   async beforeMount() {
-    if (!this.userStatus.authenticated) {
+    if (!this.userStatus.authenticated || !sessionStorage["userLevel"]) {
       var token = localStorage.getItem("token")
       if (!token) {
         return
@@ -90,6 +97,12 @@ export default {
       var response = await this.performRequest("/accounts/own", "GET")
       if (response.success) {
         this.updateHeaderInfo(response.body)
+        sessionStorage["userLevel"] = response.body.level
+        sessionStorage["userId"] = response.body.id
+        return
+      }
+      
+      if(response.statusCode === 500){
         return
       }
 

@@ -4,7 +4,8 @@
 
 <script>
 export default {
-    name: 'homeScreen'
+    name: 'homeScreen',
+    emits: [ 'triggerModal' ],
 }
 </script>
 

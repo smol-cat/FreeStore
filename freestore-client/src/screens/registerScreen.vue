@@ -24,6 +24,7 @@ export default {
         submitButton,
         hRef
     },
+    emits: [ 'triggerModal' ],
     methods: {
         async onSubmit(submitEvent) {
             var errorMessageField = document.getElementsByClassName("errorMessage")[0]

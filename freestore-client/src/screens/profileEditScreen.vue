@@ -59,6 +59,7 @@ export default {
             }
         }
     },
+    emits: [ 'triggerModal' ],
     methods: {
         async onSubmit(submitEvent) {
             var errorMessage = document.getElementsByClassName("errorMessage")[0]

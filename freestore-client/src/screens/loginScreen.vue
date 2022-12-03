@@ -21,7 +21,8 @@ export default {
         labeledInput, 
         submitButton,
         hRef
-    },  
+    },
+    emits: [ 'triggerModal' ],
     methods: {
         async onSubmit(submitEvent) {
             var body = {

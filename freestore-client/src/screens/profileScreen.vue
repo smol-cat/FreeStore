@@ -48,6 +48,7 @@ export default {
             userData: {}
         }
     },
+    emits: [ 'triggerModal' ],
     components: { HRef },
     async beforeMount() {
         if (!this.loaded) {
