@@ -79,7 +79,7 @@ export default {
         currEntry = endpoints.shift()
       }
 
-      return currEntry === undefined && (currRouteElem?.__file ?? false) ?
+      return currEntry === undefined && (currRouteElem?.name ?? false) ?
         currRouteElem : (currRouteElem?.['/'] || notFoundScreen)
     },
 
