@@ -67,7 +67,7 @@ export default {
   emits: ["triggerModal", "closeModal"],
   computed: {
     currentView() {
-      var endpoints = this.currentPath.split("/")
+      var endpoints = location.pathname.split("/")
       endpoints.shift()
       if (endpoints[endpoints.length - 1] === "") {
         endpoints.pop()
