@@ -1,14 +1,22 @@
 <template>
-  <modal-screen v-if="modalData" :message="modalData.message" :onConfirm="modalData.onConfirm" @closeModal="modalData = null"/>
-  <mainHeader :authenticated="userStatus.authenticated" :userName="(userStatus.userData ? (userStatus.userData.name + ' ' + userStatus.userData.last_name) : null)" :level="userStatus.userData?.level" />
-  <component :is="currentView" @triggerModal="(message, onConfirm) => modalData = { message: message, onConfirm: onConfirm }"/>
+  <modal-screen v-if="modalData" :message="modalData.message" :onConfirm="modalData.onConfirm"
+    @closeModal="modalData = null" />
+  <mainHeader :authenticated="userStatus.authenticated"
+    :userName="(userStatus.userData ? (userStatus.userData.name + ' ' + userStatus.userData.last_name) : null)"
+    :level="userStatus.userData?.level" />
+  <div class="content">
+    <component :is="currentView"
+      @triggerModal="(message, onConfirm) => modalData = { message: message, onConfirm: onConfirm }" />
+  </div>
+  <main-footer />
 </template>
 
 <script>
+import mainHeader from './misc/mainHeader.vue'
+import mainFooter from './misc/mainFooter.vue'
 import loginScreen from './screens/loginScreen.vue'
 import homeScreen from './screens/homeScreen.vue'
 import notFoundScreen from './screens/notFoundScreen.vue'
-import mainHeader from './misc/mainHeader.vue'
 import profileScreen from './screens/profileScreen.vue'
 import registerScreen from './screens/registerScreen.vue'
 import profileEditScreen from './screens/profileEditScreen.vue'
@@ -53,7 +61,8 @@ export default {
   name: 'app',
   components: {
     mainHeader,
-    modalScreen
+    mainFooter,
+    modalScreen,
   },
   data() {
     return {
@@ -79,7 +88,7 @@ export default {
         currEntry = endpoints.shift()
       }
 
-      return currEntry === undefined && ((currRouteElem?.screen ?? false) === true ) ?
+      return currEntry === undefined && ((currRouteElem?.screen ?? false) === true) ?
         currRouteElem : (currRouteElem?.['/'] || notFoundScreen)
     },
 
@@ -101,8 +110,8 @@ export default {
         sessionStorage["userId"] = response.body.id
         return
       }
-      
-      if(response.statusCode === 500){
+
+      if (response.statusCode === 500) {
         return
       }
 
@@ -131,6 +140,15 @@ export default {
 </script>
 
 <style>
+@import url("https://fonts.googleapis.com/css?family=Trirong");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
 body {
   background-color: #373b3b;
 }
@@ -141,6 +159,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #a1b6ca;
+  flex: 1 0 auto;
+}
+
+.content {
+  min-height: 600px;
 }
 
 .refButton {

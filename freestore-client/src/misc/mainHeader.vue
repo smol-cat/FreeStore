@@ -54,10 +54,10 @@ div .side {
     text-align: left;
     margin: 10px;
     font-size: 25px;
-    font-family: Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-family: Trirong, 'Arial Narrow Bold', sans-serif;
 }
 
-div .header {
+.header {
     margin: auto;
     display: block;
     background-color: #91a1a1;
