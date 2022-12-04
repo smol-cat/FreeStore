@@ -1,5 +1,5 @@
 <template>
-  <input class="input" :id="_id" :type="_type" :placeholder="_placeholder" :required="_required" :value="_value" />
+  <input class="input" :id="_id" :type="_type" :placeholder="_placeholder" :required="_required" :value="_value" step="0.01" />
 </template>
 
 <script>
