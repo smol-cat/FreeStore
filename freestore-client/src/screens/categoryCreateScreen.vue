@@ -9,7 +9,7 @@
                         <p>Pavadinimas</p>
                     </th>
                     <td>
-                        <labeled-input id="name" :required="true" />
+                        <labeled-input id="name" :required="true" />ą
                     </td>
                 </tr>
                 <tr>
