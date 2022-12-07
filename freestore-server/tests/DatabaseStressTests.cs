@@ -25,21 +25,20 @@ public class DatabaseStressTests
         "", "", "ernunt@gmail.com", "123456789");
     
     private int userCount = 1000;
-    private int testDurationSeconds = 300;
+    private int testDurationSeconds = 60;
     private bool finish = false;
-    private object setupLock = new();
     
     private RestUserData[] data;
     
     private List<RequestData> randomRequests = new()
     {
-        new("/categories/1/items/1/comments", Method.Get, null),
-        //new("/categories/1/items/1/comments", Method.Post, new CommentModel(){ Text = "Test comment"}),
+        new("/categories/1/items/651/comments", Method.Get, null),
+        new("/categories/1/items/651/comments", Method.Post, new CommentModel(){ Text = "Test comment"}),
         new("/accounts/4", Method.Get, null),
         new("/accounts/own", Method.Get, null),
         new("/categories", Method.Get, null),
-        new("/categories/1/items/1", Method.Get, null),
-        //new("/categories/1/items", Method.Post, new ItemModel() { Price = 0, Description = "Test Description", Title = "Test Title"}),
+        new("/categories/1/items/651", Method.Get, null),
+        new("/categories/1/items", Method.Post, new ItemModel() { Price = 0, Description = "Test Description", Title = "Test Title"}),
     };
 
     private CredentialsModel GetGeneratedUser(int i) => new CredentialsModel($"UserName_{i}", $"UserLastName_{i}", $"user{i}@gmail.com", $"UserPassword_{i}");
