@@ -65,8 +65,8 @@ Visa sąsaja susidaro iš 3 dalių
 
 Namų sąsaja:
 
-<img style="display: inline; width: 200px" class="imgFirst" src="resources/home_wf.png" alt="home_wf"/>
-<img style="width: 200px" src="resources/home.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" class="imgFirst" src="resources/home_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/home.png" alt="DeploymentDiagram"/>
 
 Prisijungimo sąsaja:
 
