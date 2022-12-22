@@ -44,8 +44,8 @@ Sistemos administratorius gali:
 Paveiksle žemiau yra pateikta sistemos diegimo diagrama, kurioje klientas gali per naršyklę komunikuoti su serveriu. Klientinei daliai kurti bus naudojamas Vue.js Javascript karkasas, ji komunikuos su API, kuriam bus naudojamas Asp.net karkasas. Duomenų bazė bus kuriama naudojant MySQL.
 
 
-<!-- <img style="display: inline-block; width: 400px" src="deployment_diagram.png" alt="DeploymentDiagram"/>
-<img style="width: 400px" src="deployment_diagram.png" alt="DeploymentDiagram"/> -->
+<!-- <img style="display: inline-block; width: 380px" src="deployment_diagram.png" alt="DeploymentDiagram"/>
+<img style="width: 380px" src="deployment_diagram.png" alt="DeploymentDiagram"/> -->
 
 ![DeploymentDiagram](/resources/deployment_diagram.png)
 
@@ -65,18 +65,18 @@ Visa sąsaja susidaro iš 3 dalių
 
 Namų sąsaja:
 
-<img style="display: inline; width: 400px" class="imgFirst" src="resources/home_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/home.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 200px" class="imgFirst" src="resources/home_wf.png" alt="home_wf"/>
+<img style="width: 200px" src="resources/home.png" alt="DeploymentDiagram"/>
 
 Prisijungimo sąsaja:
 
-<img style="display: inline; width: 400px" src="resources/login_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/login.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" src="resources/login_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/login.png" alt="DeploymentDiagram"/>
 
 Registracijos sąsaja:
 
-<img style="display: inline; width: 400px" src="resources/register_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/register.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" src="resources/register_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/register.png" alt="DeploymentDiagram"/>
 
 Prisijungusio naudotojo antraštė:
 
@@ -85,28 +85,28 @@ Prisijungusio naudotojo antraštė:
 
 Naujo skelbimo kūrimo sąsaja:
 
-<img style="display: inline; width: 400px" src="resources/newpost_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/newpost.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" src="resources/newpost_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/newpost.png" alt="DeploymentDiagram"/>
 
 Naujos kategorijos kūrimo sąsaja:
 
-<img style="display: inline; width: 400px" src="resources/newcategory_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/newcategory.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" src="resources/newcategory_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/newcategory.png" alt="DeploymentDiagram"/>
 
 Asmeninio profilio sąsaja
 
-<img style="display: inline; width: 400px" src="resources/profile_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/profile.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" src="resources/profile_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/profile.png" alt="DeploymentDiagram"/>
 
 Prekių įrašų sąsaja
 
-<img style="display: inline; width: 400px" src="resources/posts_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/posts.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" src="resources/posts_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/posts.png" alt="DeploymentDiagram"/>
 
 Prekių detalių sąsaja
 
-<img style="display: inline; width: 400px" src="resources/details_wf.png" alt="home_wf"/>
-<img style="width: 400px" src="resources/details.png" alt="DeploymentDiagram"/>
+<img style="display: inline; width: 380px" src="resources/details_wf.png" alt="home_wf"/>
+<img style="width: 380px" src="resources/details.png" alt="DeploymentDiagram"/>
 
 ## Sistemos API dokumentacija
 
