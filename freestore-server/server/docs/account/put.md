@@ -2,13 +2,11 @@
 
 Allow user to edit their account details
 
-**URL** : `/api/v1/accounts/{id}`
+**URL** : `/api/v1/accounts`
 
 **Method** : `PUT`
 
 **Auth required** : YES
-
-**Permissions required** : User is account owner
 
 **Data constraints**
 
@@ -39,9 +37,7 @@ If name and last name contain proper characters - success response.
 
 **Code** : `400 Bad Request`
 
-If one of the fields are missing 400 response will be returned.
-
-If name or last name contain special characters 406 reponse will be returned.
+If one of the fields are missing (except for phone number) 400 response will be returned.
 
 If email is incorrect
 

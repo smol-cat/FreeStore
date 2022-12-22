@@ -25,7 +25,7 @@ public class DatabaseStressTests
         "", "", "ernunt@gmail.com", "123456789");
     
     private int userCount = 1000;
-    private int testDurationSeconds = 60;
+    private int testDurationSeconds = 300;
     private bool finish = false;
     
     private RestUserData[] data;

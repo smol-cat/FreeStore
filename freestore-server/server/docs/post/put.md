@@ -79,3 +79,6 @@ If status information is not provided, null or negative:
 }
 ```
 
+**Code** : `403 Forbidden`
+
+If user does not own the resource

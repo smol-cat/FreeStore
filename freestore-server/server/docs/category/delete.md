@@ -27,3 +27,7 @@ If requested with identifier with which no category is associated 404 response w
     "message": "Category is not found"
 }
 ```
+
+**Code** : `403 Forbidden`
+
+If tried to access as a regular user and not as a system administrator

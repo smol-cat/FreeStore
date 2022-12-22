@@ -26,6 +26,22 @@ If requested with `{id} = 1` response will return information of user with ident
     "date_created": "2022-10-05T04:32:00"
 }
 ```
+If you requested an account which you own, you will receive all the information about your account. For example:
+
+```json
+{
+    "email": "jonjon@gmail.com",
+    "is_blocked": false,
+    "id": 7,
+    "name": "Jonas",
+    "last_name": "Jonaitis",
+    "level": 0,
+    "date_created": "2022-10-09T10:12:00",
+    "role": "Vartotojas"
+}
+
+```
+
 ## Error responses
 
 **Code** : `404 Not Found`

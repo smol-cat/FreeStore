@@ -27,3 +27,7 @@ If comment with provided id hierarchy was not found, following message will be r
     "message": "Comment was not found"
 }
 ```
+
+**Code** : `403 Forbidden`
+
+If not a system administrator or user does not own the resource

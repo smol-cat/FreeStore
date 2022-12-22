@@ -27,3 +27,7 @@ If item within existing category was not found, following message will be return
     "message": "Item was not found"
 }
 ```
+
+**Code** : `403 Forbidden`
+
+If not a system administrator or user does not own the resource

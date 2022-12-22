@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import app from './app.vue'
 
 var myApp = createApp(app)
-myApp.config.globalProperties.apiRoot = "https://sublime-spider-367115.lm.r.appspot.com/api/v1"
+myApp.config.globalProperties.apiRoot = "http://localhost:5189/api/v1"
 myApp.config.globalProperties.performRequest = async (uri, method, body) => {
     var headers = {
         'Content-Type': 'application/json'

@@ -47,3 +47,6 @@ If one of the fields are missing or empty.
 }
 ```
 
+**Code** : `403 Forbidden`
+
+If tried to access as a regular user and not as a system administrator

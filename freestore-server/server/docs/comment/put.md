@@ -55,3 +55,6 @@ If text is empty:
 }
 ```
 
+**Code** : `403 Forbidden`
+
+If user does not own the resource

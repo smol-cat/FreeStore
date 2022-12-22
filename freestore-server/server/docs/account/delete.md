@@ -26,3 +26,8 @@ If requested with identifier with which no account is associated 404 response wi
 {
     "message": "Account is not found"
 }
+```
+
+**Code**: `403 Forbidden`
+
+If you are not an admin and try to delete an account which you do not own.
